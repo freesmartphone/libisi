@@ -106,7 +106,7 @@ bool mtc_power_off_cb(GIsiClient *client, const void *restrict data, size_t len,
 	return true;
 }
 
-int isi_modem_probe(struct isi_modem *modem) {
+int isi_modem_create(struct isi_modem *modem) {
 	modem->client = g_isi_client_create(modem->idx, PN_MTC);
 	if (!modem->client)
 		return -ENOMEM;

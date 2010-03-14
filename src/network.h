@@ -20,8 +20,8 @@ struct network_data {
 };
 
 /* subsystem */
-struct network_data* isi_network_init(GIsiModem *idx);
-void isi_network_exit(struct network_data *nd);
+struct network_data* isi_network_create(GIsiModem *idx);
+void isi_network_destroy(struct network_data *nd);
 
 inline void network_set_user_data(struct network_data *nd, void *user_data) {
 	nd->user_data = user_data;

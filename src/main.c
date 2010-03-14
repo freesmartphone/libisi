@@ -13,7 +13,7 @@
 static void netlink_status_cb(bool up, uint8_t addr, GIsiModem *idx, void *data) {
 	g_debug("Phonet is %s, addr=0x%02x, idx=%p\n", up ? "up" : "down", addr, idx);
 	if(up)
-		isi_network_init(idx);
+		isi_network_create(idx);
 }
 
 int main(int argc, char **argv) {

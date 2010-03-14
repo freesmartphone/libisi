@@ -289,7 +289,7 @@ void network_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void 
 	isi_network_request_status(opaque);
 }
 
-struct network_data* isi_network_init(GIsiModem *idx) {
+struct network_data* isi_network_create(GIsiModem *idx) {
 	struct network_data *nd = g_try_new0(struct network_data, 1);
 
 	if(!nd)
@@ -306,7 +306,7 @@ struct network_data* isi_network_init(GIsiModem *idx) {
 	return nd;
 }
 
-void isi_network_exit(struct network_data *nd) {
+void isi_network_destroy(struct network_data *nd) {
 	g_isi_client_destroy(nd->client);
 	g_free(nd);
 }
