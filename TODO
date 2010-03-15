@@ -1,0 +1,14 @@
+[structure]
+* build as library
+* put testcode into test/
+* improve build system
+
+[network]
+* signal STATUS: DONE
+* signal RSSI: DONE
+* signal RAT: TODO
+* isi_list_operators: TODO
+* isi_current_operator: TODO
+* isi_register_auto: TODO
+* isi_register_manual: TODO
+* isi_deregister: TODO
