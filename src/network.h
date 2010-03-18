@@ -26,7 +26,7 @@ struct network_operator {
 	int status;
 };
 
-struct network_data {
+struct isi_network {
 	GIsiClient *client;
 	guint8 last_reg_mode;
 	guint8 rat;
@@ -41,26 +41,26 @@ typedef void (*isi_network_operator_cb)(bool error, struct network_operator *som
 typedef void (*isi_network_operator_list_cb)(bool error, int total, const struct network_operator *list, void *data);
 
 /* subsystem */
-struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);
-void isi_network_destroy(struct network_data *nd);
+struct isi_network* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);
+void isi_network_destroy(struct isi_network *nd);
 
 /* status */
-void isi_network_request_status(struct network_data *nd, isi_network_status_cb cb, void *user_data);
-void isi_network_subscribe_status(struct network_data *nd, isi_network_status_cb cb, void *user_data);
-void isi_network_unsubscribe_status(struct network_data *nd);
+void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data);
+void isi_network_subscribe_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data);
+void isi_network_unsubscribe_status(struct isi_network *nd);
 
 /* strength */
-void isi_network_request_strength(struct network_data *nd, isi_network_strength_cb cb, void *user_data);
-void isi_network_subscribe_strength(struct network_data *nd, isi_network_strength_cb cb, void *user_data);
-void isi_network_unsubscribe_strength(struct network_data *nd);
+void isi_network_request_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data);
+void isi_network_subscribe_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data);
+void isi_network_unsubscribe_strength(struct isi_network *nd);
 
 /* registering */
-void isi_network_register_manual(struct network_data *nd, const char *mcc, const char *mnc, isi_network_register_cb cb, void *data);
-void isi_network_register_auto(struct network_data *nd, isi_network_register_cb cb, void *data);
-void isi_network_deregister(struct network_data *nd, isi_network_register_cb cb, void *data);
+void isi_network_register_manual(struct isi_network *nd, const char *mcc, const char *mnc, isi_network_register_cb cb, void *data);
+void isi_network_register_auto(struct isi_network *nd, isi_network_register_cb cb, void *data);
+void isi_network_deregister(struct isi_network *nd, isi_network_register_cb cb, void *data);
 
 /* operator */
-void isi_network_current_operator(struct network_data *nd, isi_network_operator_cb cb, void *data);
-void isi_network_list_operators(struct network_data *nd, isi_network_operator_list_cb cb, void *data);
+void isi_network_current_operator(struct isi_network *nd, isi_network_operator_cb cb, void *data);
+void isi_network_list_operators(struct isi_network *nd, isi_network_operator_list_cb cb, void *data);
 
 #endif

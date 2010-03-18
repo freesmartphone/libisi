@@ -13,7 +13,7 @@
 #include "gisi/iter.h"
 #include "helper.h"
 
-gboolean decode_reg_status(struct network_data *nd, const guint8 *msg, size_t len, struct network_status *st) {
+gboolean decode_reg_status(struct isi_network *nd, const guint8 *msg, size_t len, struct network_status *st) {
 	enum net_reg_status *status = &st->status;
 	guint16 *lac = &st->lac;
 	guint16 *ci = &st->cid;
@@ -133,7 +133,7 @@ static inline int isi_status_to_at_status(guint8 status) {
 void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = opaque;
-	struct network_data *nd = cbd->subsystem;
+	struct isi_network *nd = cbd->subsystem;
 	isi_network_status_cb cb = cbd->callback;
 	void *user_data = cbd->data;
 	isi_cb_data_free(cbd);
@@ -178,7 +178,7 @@ bool reg_status_resp_cb(GIsiClient *client, const void *restrict data, size_t le
 	return true;
 }
 
-void isi_network_request_status(struct network_data *nd, isi_network_status_cb cb, void *user_data) {
+void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 
 	const unsigned char msg[] = {
@@ -191,7 +191,7 @@ void isi_network_request_status(struct network_data *nd, isi_network_status_cb c
 	}
 }
 
-void isi_network_subscribe_status(struct network_data *nd, isi_network_status_cb cb, void *user_data) {
+void isi_network_subscribe_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
@@ -199,14 +199,14 @@ void isi_network_subscribe_status(struct network_data *nd, isi_network_status_cb
 	}
 }
 
-void isi_network_unsubscribe_status(struct network_data *nd) {
+void isi_network_unsubscribe_status(struct isi_network *nd) {
 	g_isi_unsubscribe(nd->client, NET_REG_STATUS_IND);
 }
 
 void network_rssi_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = opaque;
-	struct network_data *nd = cbd->subsystem;
+	struct isi_network *nd = cbd->subsystem;
 	isi_network_strength_cb cb = cbd->callback;
 	void *user_data = cbd->data;
 	isi_cb_data_free(cbd);
@@ -224,7 +224,7 @@ void network_rssi_ind_cb(GIsiClient *client, const void *restrict data, size_t l
 bool network_rssi_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = opaque;
-	struct network_data *nd = cbd->subsystem;
+	struct isi_network *nd = cbd->subsystem;
 	isi_network_strength_cb cb = cbd->callback;
 	void *user_data = cbd->data;
 	isi_cb_data_free(cbd);
@@ -281,7 +281,7 @@ bool network_rssi_resp_cb(GIsiClient *client, const void *restrict data, size_t 
 	return true;
 }
 
-void isi_network_request_strength(struct network_data *nd, isi_network_strength_cb cb, void *user_data) {
+void isi_network_request_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 
 	const unsigned char msg[] = {
@@ -297,7 +297,7 @@ void isi_network_request_strength(struct network_data *nd, isi_network_strength_
 	isi_cb_data_free(cbd);
 }
 
-void isi_network_subscribe_strength(struct network_data *nd, isi_network_strength_cb cb, void *user_data) {
+void isi_network_subscribe_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, NET_RSSI_IND, network_rssi_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
@@ -305,7 +305,7 @@ void isi_network_subscribe_strength(struct network_data *nd, isi_network_strengt
 	}
 }
 
-void isi_network_unsubscribe_strength(struct network_data *nd) {
+void isi_network_unsubscribe_strength(struct isi_network *nd) {
 	g_isi_unsubscribe(nd->client, NET_RSSI_IND);
 }
 
@@ -328,8 +328,8 @@ void network_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void 
 	isi_cb_data_free(cbd);
 }
 
-struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
-	struct network_data *nd = calloc(sizeof(struct network_data), 1);
+struct isi_network* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
+	struct isi_network *nd = calloc(sizeof(struct isi_network), 1);
 	struct isi_cb_data *cbd = isi_cb_data_new(NULL, cb, data);
 
 	if(!nd || !cbd || !modem->idx)
@@ -351,7 +351,7 @@ struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_r
 		return NULL;
 }
 
-void isi_network_destroy(struct network_data *nd) {
+void isi_network_destroy(struct isi_network *nd) {
 	if(!nd)
 		return;
 	g_isi_client_destroy(nd->client);
@@ -361,7 +361,7 @@ void isi_network_destroy(struct network_data *nd) {
 bool set_manual_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = user_data;
-	struct network_data *nd = cbd->subsystem;
+	struct isi_network *nd = cbd->subsystem;
 	isi_network_register_cb cb = cbd->callback;
 
 	if(!msg) {
@@ -392,7 +392,7 @@ out:
 bool set_auto_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = user_data;
-	struct network_data *nd = cbd->subsystem;
+	struct isi_network *nd = cbd->subsystem;
 	isi_network_register_cb cb = cbd->callback;
 
 	if(!msg) {
@@ -420,7 +420,7 @@ out:
 	return true;
 }
 
-void isi_network_register_manual(struct network_data *nd, const char *mcc, const char *mnc, isi_network_register_cb cb, void *data) {
+void isi_network_register_manual(struct isi_network *nd, const char *mcc, const char *mnc, isi_network_register_cb cb, void *data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, data);
 
 	/* generate bcd */
@@ -448,7 +448,7 @@ void isi_network_register_manual(struct network_data *nd, const char *mcc, const
 	g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_SET_TIMEOUT, set_manual_resp_cb, cbd);
 }
 
-void isi_network_register_auto(struct network_data *nd, isi_network_register_cb cb, void *data) {
+void isi_network_register_auto(struct isi_network *nd, isi_network_register_cb cb, void *data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, data);
 
 	const unsigned char msg[] = {
@@ -471,7 +471,7 @@ void isi_network_register_auto(struct network_data *nd, isi_network_register_cb 
 		isi_cb_data_free(cbd);
 }
 
-void isi_network_deregister(struct network_data *nd, isi_network_register_cb cb, void *data) {
+void isi_network_deregister(struct isi_network *nd, isi_network_register_cb cb, void *data) {
 	g_critical("Network deregister is not implemented!");
 	cb(true, data);
 }
@@ -540,7 +540,7 @@ out:
 	return true;
 }
 
-void isi_network_current_operator(struct network_data *nd, isi_network_operator_cb cb, void *data) {
+void isi_network_current_operator(struct isi_network *nd, isi_network_operator_cb cb, void *data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, data);
 
 	const unsigned char msg[] = {
@@ -644,7 +644,7 @@ out:
 	return true;
 }
 
-void isi_network_list_operators(struct network_data *nd, isi_network_operator_list_cb cb, void *data) {
+void isi_network_list_operators(struct isi_network *nd, isi_network_operator_list_cb cb, void *data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, data);
 
 	const unsigned char msg[] = {
