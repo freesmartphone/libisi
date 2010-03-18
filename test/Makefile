@@ -1,5 +1,5 @@
 test: test.vala
-	valac --vapidir=../vapi --pkg libisi test.vala
+	valac --vapidir=../vapi --pkg libisi -g test.vala
 
 clean:
 	rm -rf test
