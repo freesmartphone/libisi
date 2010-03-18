@@ -123,18 +123,18 @@ namespace ISI {
 		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
 
 		[CCode (has_target = false)]
-		public delegate void status_cb(status *status, void *user_data);
+		public delegate void status_cb(bool error, status *status, void *user_data);
 
-		[CCode (has_target = false)]
-		public delegate void strength_cb(uint8 strength, void *user_data);
+		[CCode (cname = "isi_network_strength_cb", has_target = false)]
+		public delegate void strength_cb(bool error, uint8 strength, void *user_data);
 
-		[CCode (has_target = false)]
+		[CCode (cname = "isi_network_register_cb", has_target = false)]
 		public delegate void register_cb(bool error, void *user_data);
 
-		[CCode (has_target = false)]
+		[CCode (cname = "isi_network_operator_cb", has_target = false)]
 		public delegate void operator_cb(bool error, operator *operator, void *user_data);
 
-		[CCode (has_target = false)]
+		[CCode (cname = "isi_network_operator_list_cb", has_target = false)]
 		public delegate void operator_list_cb(bool error, operator[] operators, void *user_data);
 
 		/**
