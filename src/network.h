@@ -41,7 +41,7 @@ typedef void (*isi_network_operator_cb)(bool error, struct network_operator *som
 typedef void (*isi_network_operator_list_cb)(bool error, int total, const struct network_operator *list, void *data);
 
 /* subsystem */
-struct network_data* isi_network_create(GIsiModem *idx, isi_subsystem_reachable_cb cb, void *data);
+struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);
 void isi_network_destroy(struct network_data *nd);
 
 /* status */

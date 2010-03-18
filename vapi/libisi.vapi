@@ -29,13 +29,6 @@ namespace ISI {
 	}
 
 	/**
-	 * FIXME: not sure if this will stay in the vapi binding
-	 * or if it will be abstracted by the Modem class
-	 */
-	[CCode (cname = "GIsiModem")]
-	public struct GIsiModem { }
-
-	/**
 	 * The network subsystem of the GSM modem
 	 */
 	[CCode (cname = "isi_network", free_function = "isi_network_destroy")]
@@ -116,7 +109,7 @@ namespace ISI {
 		 * Create network GSM subsystem
 		 */
 		[CCode (cname = "isi_network_create")]
-		public Network(GIsiModem *idx, subsystem_reachable cb, void *user_data);
+		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
 
 		[CCode (has_target = false)]
 		public delegate void status_callback(status *status, void *user_data);
@@ -138,14 +131,14 @@ namespace ISI {
 		 * network status.
 		 */
 		[CCode (cname = "isi_network_request_status")]
-		public bool request_status(status_callback cb, void *data);
+		public void request_status(status_callback cb, void *data);
 
 		/**
 		 * Subscribe to status changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_status")]
-		public bool subscribe_status(status_callback cb, void *data);
+		public void subscribe_status(status_callback cb, void *data);
 
 		/**
 		 * Unsubscribe from status changing notifications
@@ -186,7 +179,7 @@ namespace ISI {
 		public void register_auto(register_cb cb, void *data);
 
 		/**
-		 * Deregister from the network (FIXME: ''not yet implemented'')
+		 * Deregister from the network (''not yet implemented'')
 		 */
 		[CCode (cname = "isi_network_deregister")]
 		public void deregister(register_cb cb, void *data);

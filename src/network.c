@@ -328,14 +328,14 @@ void network_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void 
 	isi_cb_data_free(cbd);
 }
 
-struct network_data* isi_network_create(GIsiModem *idx, isi_subsystem_reachable_cb cb, void *data) {
+struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
 	struct network_data *nd = calloc(sizeof(struct network_data), 1);
 	struct isi_cb_data *cbd = isi_cb_data_new(NULL, cb, data);
 
 	if(!nd || !cbd)
 		goto error;
 
-	nd->client = g_isi_client_create(idx, PN_NETWORK);
+	nd->client = g_isi_client_create(modem->idx, PN_NETWORK);
 	if(!nd->client)
 		goto error;
 
