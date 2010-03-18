@@ -19,21 +19,38 @@ namespace ISI {
 	[CCode (cname = "struct isi_modem", free_function = "isi_modem_destroy", cheader_filename = "isi/modem.h")]
 	[Compact]
 	public class Modem {
-		[CCode (has_target = false)]
+		[CCode (cname = "isi_powerstatus_cb", has_target = false)]
 		public delegate void powerstatus_cb(bool power, void *data);
 
+		/**
+		 * @param interface interface name (e.g. "phonet0")
+		 * @param cb callback informing about success
+		 * @param user_data user data being sent to the callback
+		 */
 		[CCode (cname = "isi_modem_create")]
 		public Modem(char *interface, subsystem_reachable cb, void *user_data);
 
+		/**
+		 * callback will be called if powerstatus changes
+		 */
 		[CCode (cname = "isi_modem_set_powerstatus_notification")]
 		public void set_powerstatus_cb(powerstatus_cb cb, void *user_data);
 
+		/**
+		 * get current powerstatus
+		 */
 		[CCode (cname = "isi_modem_get_powerstatus")]
 		public bool get_powerstatus();
 
+		/**
+		 * enable the modem
+		 */
 		[CCode (cname = "isi_modem_enable")]
 		public void enable();
 
+		/**
+		 * disable the modem
+		 */
 		[CCode (cname = "isi_modem_disable")]
 		public void disable();
 	}
@@ -122,7 +139,7 @@ namespace ISI {
 		[CCode (cname = "isi_network_create")]
 		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
 
-		[CCode (has_target = false)]
+		[CCode (cname = "isi_network_status_cb", has_target = false)]
 		public delegate void status_cb(bool error, status *status, void *user_data);
 
 		[CCode (cname = "isi_network_strength_cb", has_target = false)]
