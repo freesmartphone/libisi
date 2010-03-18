@@ -23,15 +23,19 @@ namespace ISI {
 		public delegate void powerstatus_cb(bool power, void *data);
 
 		/**
+		 * Create modem class
 		 * @param interface interface name (e.g. "phonet0")
-		 * @param cb callback informing about success
-		 * @param user_data user data being sent to the callback
+		 * @param cb callback informing about (un-)successful creation
+		 * @param user_data user data being sent with the callback
 		 */
 		[CCode (cname = "isi_modem_create")]
 		public Modem(char *interface, subsystem_reachable cb, void *user_data);
 
 		/**
-		 * callback will be called if powerstatus changes
+		 * callback will be called if powerstatus changes. This will
+		 * overwrite the previous callback.
+		 * @param cb callback being called on powerstatus changes
+		 * @param user_data user data being sent with the callback
 		 */
 		[CCode (cname = "isi_modem_set_powerstatus_notification")]
 		public void set_powerstatus_cb(powerstatus_cb cb, void *user_data);
