@@ -332,7 +332,7 @@ struct network_data* isi_network_create(struct isi_modem *modem, isi_subsystem_r
 	struct network_data *nd = calloc(sizeof(struct network_data), 1);
 	struct isi_cb_data *cbd = isi_cb_data_new(NULL, cb, data);
 
-	if(!nd || !cbd)
+	if(!nd || !cbd || !modem->idx)
 		goto error;
 
 	nd->client = g_isi_client_create(modem->idx, PN_NETWORK);

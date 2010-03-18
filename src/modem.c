@@ -6,12 +6,15 @@
 #include <stdio.h>
 #include <glib.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include "gisi/modem.h"
 #include "opcodes/mtc.h"
 
 #include "debug.h"
 #include "modem.h"
+#include "netlink.h"
+#include "helper.h"
 
 void mtc_state_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
@@ -28,7 +31,9 @@ void mtc_state_cb(GIsiClient *client, const void *restrict data, size_t len, uin
 	g_debug("current modem state: %s (0x%02X)", mtc_modem_state_name(msg[1]), msg[1]);
 	g_debug("target modem state: %s (0x%02X)", mtc_modem_state_name(msg[2]), msg[2]);
 
-	isi->powerstatus(msg[1] != MTC_POWER_OFF);
+	isi->power = (msg[1] != MTC_POWER_OFF);
+	if(isi->powerstatus)
+		isi->powerstatus(msg[1] != MTC_POWER_OFF, isi->user_data);
 }
 
 bool mtc_query_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
@@ -46,18 +51,25 @@ bool mtc_query_cb(GIsiClient *client, const void *restrict data, size_t len, uin
 	g_debug("current modem state: %s (0x%02X)", mtc_modem_state_name(msg[1]), msg[1]);
 	g_debug("target modem state: %s (0x%02X)", mtc_modem_state_name(msg[2]), msg[2]);
 
-	isi->powerstatus(msg[1] != MTC_POWER_OFF);
+	isi->power = (msg[1] != MTC_POWER_OFF);
 	return true;
 }
 
-void reachable_cb(GIsiClient *client, bool alive, uint16_t object, void *opaque) {
+void modem_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void *opaque) {
+	struct isi_cb_data *cbd = opaque;
+	isi_subsystem_reachable_cb cb = cbd->callback;
+	struct isi_modem *modem = cbd->subsystem;
+	void * user_data = cbd->data;
+	isi_cb_data_free(opaque);
+
 	const unsigned char msg[] = {
 		MTC_STATE_QUERY_REQ,
 		0x00, 0x00 /* Filler */
 	};
 
 	if(!alive) {
-		g_debug("Unable to bootstrap mtc driver");
+		g_warning("Unable to bootstrap mtc driver");
+		cb(true, user_data);
 		return;
 	}
 
@@ -66,8 +78,10 @@ void reachable_cb(GIsiClient *client, bool alive, uint16_t object, void *opaque)
 		g_isi_version_major(client),
 		g_isi_version_minor(client));
 
-	g_isi_subscribe(client, MTC_STATE_INFO_IND, mtc_state_cb, opaque);
-	g_isi_request_make(client, msg, sizeof(msg), MTC_TIMEOUT, mtc_query_cb, opaque);
+	cb(false, user_data);
+
+	g_isi_subscribe(client, MTC_STATE_INFO_IND, mtc_state_cb, modem);
+	g_isi_request_make(client, msg, sizeof(msg), MTC_TIMEOUT, mtc_query_cb, modem);
 }
 
 bool mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
@@ -82,8 +96,10 @@ bool mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t len, 
 	if(len < 2 || msg[0] != MTC_POWER_ON_RESP)
 		return false;
 
-	if(msg[1] == MTC_OK)
-		isi->powerstatus(true);
+	if(msg[1] == MTC_OK) {
+		isi->power = true;
+		isi->powerstatus(true, isi->user_data);
+	}
 
 	return true;
 }
@@ -100,20 +116,69 @@ bool mtc_power_off_cb(GIsiClient *client, const void *restrict data, size_t len,
 	if(len < 2 || msg[0] != MTC_POWER_OFF_RESP)
 		return false;
 
-	if(msg[1] == MTC_OK)
-		isi->powerstatus(false);
+	if(msg[1] == MTC_OK) {
+		isi->power = false;
+		if(isi->powerstatus)
+			isi->powerstatus(false, isi->user_data);
+	}
 
 	return true;
 }
 
-int isi_modem_create(struct isi_modem *modem) {
-	modem->client = g_isi_client_create(modem->idx, PN_MTC);
-	if (!modem->client)
-		return -ENOMEM;
+static void netlink_status_cb(bool up, uint8_t addr, GIsiModem *idx, void *data) {
+	struct isi_cb_data *cbd = data;
+	isi_subsystem_reachable_cb cb = cbd->callback;
+	struct isi_modem *modem = cbd->subsystem;
+	void * user_data = cbd->data;
 
-	g_isi_verify(modem->client, reachable_cb, modem);
+	g_debug("Phonet is %s, addr=0x%02x, idx=%p\n", up ? "up" : "down", addr, idx);
 
-	return 0;
+	if(up) {
+		modem->idx = idx;
+		modem->client = g_isi_client_create(idx, PN_MTC);
+
+		if(!modem->client) {
+			cb(true, user_data);
+			isi_cb_data_free(cbd);
+			return;
+		}
+
+		g_isi_verify(modem->client, modem_reachable_cb, cbd);
+	} else {
+		g_isi_client_destroy(modem->client);
+		modem->client = NULL;
+		modem->idx = NULL;
+		modem->status = false;
+		cb(true, user_data);
+	}
+}
+
+struct isi_modem* isi_modem_create(char *interface, isi_subsystem_reachable_cb cb, void *user_data) {
+	struct isi_modem *modem = malloc(sizeof(struct isi_modem));
+	struct isi_cb_data *cbd = isi_cb_data_new(modem, cb, user_data);
+
+	if(!modem || !cbd)
+		goto error;
+
+	modem->link = g_pn_netlink_start(netlink_status_cb, interface, cbd);
+
+	return modem;
+
+	error:
+		if(modem)
+			free(modem);
+		isi_cb_data_free(cbd);
+		cb(true, user_data);
+		return NULL;
+}
+
+void isi_modem_set_powerstatus_notification(struct isi_modem *modem, isi_powerstatus_cb cb, void *user_data) {
+	modem->powerstatus = cb;
+	modem->user_data = user_data;
+}
+
+bool isi_modem_get_powerstatus(struct isi_modem *modem) {
+	return modem->power;
 }
 
 int isi_modem_enable(struct isi_modem *modem) {

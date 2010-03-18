@@ -1,17 +1,6 @@
 [structure]
-* build as library
 * put testcode into test/
 * improve build system
-
-[modem]
-* create(string: interface_name)
-  new Modem("phonet0")
-* status
-* notify_status
-* enable
-* disable
-* static list_available()
-* netlink layer status changes
 
 [network]
 * signal RAT

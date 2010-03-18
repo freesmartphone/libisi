@@ -14,12 +14,21 @@ namespace ISI {
 	public delegate void subsystem_reachable(bool error, void *data);
 
 	/**
-	 * GSM modem (''WIP'')
+	 * GSM modem
 	 */
-	[CCode (cname = "isi_modem", free_function = "isi_modem_free")]
+	[CCode (cname = "isi_modem", free_function = "isi_modem_destroy")]
 	public class Modem {
+		[CCode (has_target = false)]
+		public delegate void powerstatus_cb(bool power, void *data);
+
 		[CCode (cname = "isi_modem_create")]
-		public Modem();
+		public Modem(char *interface, subsystem_reachable cb, void *user_data);
+
+		[CCode (cname = "isi_modem_set_powerstatus_notification")]
+		public void set_powerstatus_cb(powerstatus_cb cb, void *user_data);
+
+		[CCode (cname = "isi_modem_get_powerstatus")]
+		public bool get_powerstatus();
 
 		[CCode (cname = "isi_modem_enable")]
 		public void enable();
@@ -112,10 +121,10 @@ namespace ISI {
 		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
 
 		[CCode (has_target = false)]
-		public delegate void status_callback(status *status, void *user_data);
+		public delegate void status_cb(status *status, void *user_data);
 
 		[CCode (has_target = false)]
-		public delegate void strength_callback(uint8 strength, void *user_data);
+		public delegate void strength_cb(uint8 strength, void *user_data);
 
 		[CCode (has_target = false)]
 		public delegate void register_cb(bool error, void *user_data);
@@ -131,14 +140,14 @@ namespace ISI {
 		 * network status.
 		 */
 		[CCode (cname = "isi_network_request_status")]
-		public void request_status(status_callback cb, void *data);
+		public void request_status(status_cb cb, void *data);
 
 		/**
 		 * Subscribe to status changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_status")]
-		public void subscribe_status(status_callback cb, void *data);
+		public void subscribe_status(status_cb cb, void *data);
 
 		/**
 		 * Unsubscribe from status changing notifications
@@ -151,14 +160,14 @@ namespace ISI {
 		 * signal strength.
 		 */
 		[CCode (cname = "isi_network_request_strength")]
-		public void request_strength(strength_callback cb, void *data);
+		public void request_strength(strength_cb cb, void *data);
 
 		/**
 		 * Subscribe to strength changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_strength")]
-		public void subscribe_strength(strength_callback cb, void *data);
+		public void subscribe_strength(strength_cb cb, void *data);
 
 		/**
 		 * Unsubscribe from strength changing notifications
