@@ -8,7 +8,13 @@
  */
 namespace ISI {
 	/**
-	 * GSM modem
+	 * Send as answer to the creation of a subsystem
+	 */
+	[CCode (has_target = false)]
+	public delegate void subsystem_reachable(bool error, void *data);
+
+	/**
+	 * GSM modem (''WIP'')
 	 */
 	[CCode (cname = "isi_modem", free_function = "isi_modem_free")]
 	public class Modem {
@@ -84,10 +90,33 @@ namespace ISI {
 		}
 
 		/**
+		 * Data send to network operator callback
+		 */
+		[CCode (cname = "network_operator")]
+		public struct operator {
+			/**
+			 * Network Operator Name
+			 */
+			char *name;
+			/**
+			 * Mobile Country Code
+			 */
+			char *mcc;
+			/**
+			 * Mobile Network Code
+			 */
+			char *mnc;
+			/**
+			 * Status Code (not set by current_operator method)
+			 */
+			int status;
+		}
+
+		/**
 		 * Create network GSM subsystem
 		 */
 		[CCode (cname = "isi_network_create")]
-		public Network(GIsiModem *idx);
+		public Network(GIsiModem *idx, subsystem_reachable cb, void *user_data);
 
 		[CCode (has_target = false)]
 		public delegate void status_callback(status *status, void *user_data);
@@ -95,41 +124,31 @@ namespace ISI {
 		[CCode (has_target = false)]
 		public delegate void strength_callback(uint8 strength, void *user_data);
 
-		/**
-		 * Set user_data, which is delivered in the callbacks
-		 */
-		[CCode (cname = "isi_network_set_user_data")]
-		public void set_user_data(void *user_data);
+		[CCode (has_target = false)]
+		public delegate void register_cb(bool error, void *user_data);
 
-		/**
-		 * Set callback for strength notifications
-		 */
-		[CCode (cname = "isi_network_set_strength_cb")]
-		public void set_strength_cb(strength_callback cb);
+		[CCode (has_target = false)]
+		public delegate void operator_cb(bool error, operator *operator, void *user_data);
 
-		/**
-		 * Set callback for status notifications
-		 */
-		[CCode (cname = "isi_network_set_status_cb")]
-		public void set_status_cb(status_callback cb);
+		[CCode (has_target = false)]
+		public delegate void operator_list_cb(bool error, operator[] operators, void *user_data);
 
 		/**
 		 * Request to send notification for current
 		 * network status.
-		 * @return true on sucess, false on failure
 		 */
 		[CCode (cname = "isi_network_request_status")]
-		public bool request_status();
+		public bool request_status(status_callback cb, void *data);
 
 		/**
 		 * Subscribe to status changing notifications
-		 * @return true on sucess, false on failure
+		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_status")]
-		public bool subscribe_status();
+		public bool subscribe_status(status_callback cb, void *data);
 
 		/**
-		 * Unsubscribe to status changing notifications
+		 * Unsubscribe from status changing notifications
 		 */
 		[CCode (cname = "isi_network_unsubscribe_status")]
 		public void unsubscribe_status();
@@ -137,47 +156,76 @@ namespace ISI {
 		/**
 		 * Request to send notification for current
 		 * signal strength.
-		 * @return true on sucess, false on failure
 		 */
 		[CCode (cname = "isi_network_request_strength")]
-		public bool request_strength();
+		public void request_strength(strength_callback cb, void *data);
 
 		/**
 		 * Subscribe to strength changing notifications
-		 * @return true on sucess, false on failure
+		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_strength")]
-		public bool subscribe_strength();
+		public void subscribe_strength(strength_callback cb, void *data);
 
 		/**
 		 * Unsubscribe from strength changing notifications
 		 */
 		[CCode (cname = "isi_network_unsubscribe_strength")]
 		public void unsubscribe_strength();
+
+		/**
+		 * Register to a specific operator
+		 */
+		[CCode (cname = "isi_network_register_manual")]
+		public void register_manual(char *mcc, char *mnc, register_cb cb, void *data);
+
+		/**
+		 * Register to a specific operator
+		 */
+		[CCode (cname = "isi_network_register_auto")]
+		public void register_auto(register_cb cb, void *data);
+
+		/**
+		 * Deregister from the network (FIXME: ''not yet implemented'')
+		 */
+		[CCode (cname = "isi_network_deregister")]
+		public void deregister(register_cb cb, void *data);
+
+		/**
+		 * Get Information about the current operator
+		 */
+		[CCode (cname = "isi_network_current_operator")]
+		public void current_operator(operator_cb cb, void *data);
+
+		/**
+		 * Get Information about all nearby operators
+		 */
+		[CCode (cname = "isi_network_list_operators")]
+		public void list_operators(operator_list_cb cb, void *data);
 	}
 
 	/**
-	 * The USSD subsystem of the GSM modem
+	 * The USSD subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class USSD { }
 
 	/**
-	 * The Device subsystem of the GSM modem
+	 * The Device subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class Device { }
 
 	/**
-	 * The SIM subsystem of the GSM modem
+	 * The SIM subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class SIM { }
 
 	/**
-	 * The Call subsystem of the GSM modem
+	 * The Call subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class Call { }
 
 	/**
-	 * The SMS subsystem of the GSM modem
+	 * The SMS subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class SMS { }
 }

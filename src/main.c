@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "network.h"
 
+#if 0
 static void netlink_status_cb(bool up, uint8_t addr, GIsiModem *idx, void *data) {
 	g_debug("Phonet is %s, addr=0x%02x, idx=%p\n", up ? "up" : "down", addr, idx);
 	if(up)
@@ -33,3 +34,6 @@ int main(int argc, char **argv) {
 	loop = g_main_loop_new(NULL, false);
 	g_main_loop_run(loop);
 }
+#endif
+
+int main() {}
