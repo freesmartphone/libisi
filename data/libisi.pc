@@ -1,0 +1,5 @@
+Name: libisi
+Description: lowlevel N900 modem access library
+Version: 0.0.0
+Libs: -lisi
+CFlags: -std=c99

@@ -10,13 +10,14 @@ namespace ISI {
 	/**
 	 * Send as answer to the creation of a subsystem
 	 */
-	[CCode (has_target = false)]
+	[CCode (cname = "isi_subsystem_reachable_cb", has_target = false, cheader_filename = "isi/modem.h")]
 	public delegate void subsystem_reachable(bool error, void *data);
 
 	/**
 	 * GSM modem
 	 */
-	[CCode (cname = "isi_modem", free_function = "isi_modem_destroy")]
+	[CCode (cname = "struct isi_modem", free_function = "isi_modem_destroy", cheader_filename = "isi/modem.h")]
+	[Compact]
 	public class Modem {
 		[CCode (has_target = false)]
 		public delegate void powerstatus_cb(bool power, void *data);
@@ -40,7 +41,8 @@ namespace ISI {
 	/**
 	 * The network subsystem of the GSM modem
 	 */
-	[CCode (cname = "isi_network", free_function = "isi_network_destroy")]
+	[CCode (cname = "struct isi_network", free_function = "isi_network_destroy", cheader_filename = "isi/network.h")]
+	[Compact]
 	public class Network {
 		[CCode (cname = "net_reg_status")]
 		public enum registration_status {

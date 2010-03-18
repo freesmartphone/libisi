@@ -1,6 +1,2 @@
-[structure]
-* put testcode into test/
-* improve build system
-
 [network]
 * signal RAT

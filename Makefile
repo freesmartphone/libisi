@@ -3,14 +3,19 @@ all:
 
 install:
 	cd src ; make install
+	cd data ; make install
+
+uninstall:
+	cd src ; make uninstall
+	cd data ; make uninstall
 
 clean:
 	cd src ; make clean
-	#cd test ; make clean
+	cd test ; make clean
 
-#test:
-#	cd test ; make
+test: install
+	cd test ; make
 
 doc:
 	rm -rf html
-	valadoc vapi/*.vapi -o html
+	valadoc data/*.vapi -o html

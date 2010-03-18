@@ -2,8 +2,11 @@ SOURCES:=$(wildcard gisi/*.c *.c)
 OBJECTS:=$(patsubst %.c, %.o, $(SOURCES))
 CFLAGS:=`pkg-config --cflags glib-2.0`
 LIBS:=`pkg-config --libs glib-2.0`
+UNVERSIONED:=libisi.so
 NAME:=libisi.so.0
 LONGNAME:=libisi.so.0.0.0
+
+include ../config.mk
 
 all: $(LONGNAME)
 
@@ -18,4 +21,21 @@ $(LONGNAME): $(OBJECTS)
 clean:
 	rm -f test gisi/*.o *.o $(LONGNAME)
 
-.PHONY: all clean
+install: all
+	@echo Installing shared object...
+	@$(INSTALL_LIB) $(LONGNAME) $(DESTDIR)$(PREFIX)/lib
+	@ln -sf $(LONGNAME) $(DESTDIR)$(PREFIX)/lib/$(NAME)
+	@ln -sf $(NAME) $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
+	@echo Installing header files...
+	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi
+	@$(INSTALL_DATA) modem.h network.h opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
+
+uninstall:
+	@echo Removing shared object...
+	@rm -rf $(DESTDIR)$(PREFIX)/lib/$(LONGNAME)
+	@rm -rf $(DESTDIR)$(PREFIX)/lib/$(NAME)
+	@rm -rf $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
+	@echo Removing headers...
+	@rm -rf $(DESTDIR)$(PREFIX)/include/isi
+
+.PHONY: all clean install

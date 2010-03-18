@@ -172,6 +172,11 @@ struct isi_modem* isi_modem_create(char *interface, isi_subsystem_reachable_cb c
 		return NULL;
 }
 
+void isi_modem_destroy(struct isi_modem *modem) {
+	g_isi_client_destroy(modem->client);
+	free(modem);
+}
+
 void isi_modem_set_powerstatus_notification(struct isi_modem *modem, isi_powerstatus_cb cb, void *user_data) {
 	modem->powerstatus = cb;
 	modem->user_data = user_data;
