@@ -85,12 +85,12 @@ void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void 
 	g_isi_subscribe(client, SIM_IND, sim_ind_cb, user_data);
 
 	/* Check if SIM is ready */
-	isi_sim_read_hplmn(user_data);
+	isi_sim_read_hplmn(cbd->data);
 }
 
 struct isi_sim* isi_sim_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
 	struct isi_sim *nd = calloc(sizeof(struct isi_sim), 1);
-	struct isi_cb_data *cbd = isi_cb_data_new(NULL, cb, data);
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, data);
 
 	if(!nd || !cbd || !modem->idx)
 		goto error;
