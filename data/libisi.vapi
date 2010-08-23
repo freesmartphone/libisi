@@ -263,25 +263,25 @@ namespace ISI {
 		/**
 		 * Query Manufacturer
 		 */
-		[CCode (cname = "isi_device_information_query_manufacturer")]
+		[CCode (cname = "isi_device_info_query_manufacturer")]
 		public void query_manufacturer(device_info_cb cb, void *data);
 
 		/**
 		 * Query Model
 		 */
-		[CCode (cname = "isi_device_information_query_model")]
+		[CCode (cname = "isi_device_info_query_model")]
 		public void query_model(device_info_cb cb, void *data);
 
 		/**
 		 * Query Revision
 		 */
-		[CCode (cname = "isi_device_information_query_revision")]
+		[CCode (cname = "isi_device_info_query_revision")]
 		public void query_revision(device_info_cb cb, void *data);
 
 		/**
 		 * Query Serial (IMEI)
 		 */
-		[CCode (cname = "isi_device_information_query_serial")]
+		[CCode (cname = "isi_device_info_query_serial")]
 		public void query_serial(device_info_cb cb, void *data);
 	}
 
