@@ -12,7 +12,7 @@ struct isi_device_info {
 };
 
 /* callbacks */
-typedef void (*isi_device_info_cb)(gboolean error, char *msg, char *user_data);
+typedef void (*isi_device_info_cb)(gboolean error, const char *msg, void *user_data);
 
 /* subsystem */
 struct isi_device_info* isi_device_info_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);

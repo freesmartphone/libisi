@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "opcodes/info.h"
-#include "info.h"
+#include "device_info.h"
 #include "modem.h"
 #include "debug.h"
 #include "gisi/iter.h"
