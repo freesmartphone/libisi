@@ -5,6 +5,7 @@ LIBS:=`pkg-config --libs glib-2.0`
 UNVERSIONED:=libisi.so
 NAME:=libisi.so.0
 LONGNAME:=libisi.so.0.0.0
+HEADERS:=modem.h network.h device_info.h
 
 include ../config.mk
 
@@ -28,7 +29,7 @@ install: all
 	@ln -sf $(NAME) $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
 	@echo Installing header files...
 	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi
-	@$(INSTALL_DATA) modem.h network.h opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
+	@$(INSTALL_DATA) $(HEADERS) opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
 
 uninstall:
 	@echo Removing shared object...
