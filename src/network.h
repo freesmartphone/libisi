@@ -4,8 +4,8 @@
 #include "gisi/client.h"
 #include "modem.h"
 
-#ifndef ISI_NETWORK_H
-#define ISI_NETWORK_H
+#ifndef _ISI_NETWORK_H
+#define _ISI_NETWORK_H
 
 /* Theoretical limit is 16, but each GSM char can be encoded into
  *  * 3 UTF8 characters resulting in 16*3=48 chars

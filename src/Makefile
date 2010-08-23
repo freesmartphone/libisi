@@ -1,6 +1,6 @@
 SOURCES:=$(wildcard gisi/*.c *.c)
 OBJECTS:=$(patsubst %.c, %.o, $(SOURCES))
-CFLAGS:=`pkg-config --cflags glib-2.0`
+CFLAGS:=`pkg-config --cflags glib-2.0` -D_POSIX_C_SOURCE=200112L
 LIBS:=`pkg-config --libs glib-2.0`
 UNVERSIONED:=libisi.so
 NAME:=libisi.so.0

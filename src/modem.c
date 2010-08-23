@@ -7,6 +7,7 @@
 #include <glib.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "gisi/modem.h"
 #include "opcodes/mtc.h"
@@ -36,7 +37,7 @@ void mtc_state_cb(GIsiClient *client, const void *restrict data, size_t len, uin
 		isi->powerstatus(msg[1] != MTC_POWER_OFF, isi->user_data);
 }
 
-bool mtc_query_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+gboolean mtc_query_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_modem *isi = opaque;
 
@@ -55,7 +56,7 @@ bool mtc_query_cb(GIsiClient *client, const void *restrict data, size_t len, uin
 	return true;
 }
 
-void modem_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void *opaque) {
+void modem_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void *opaque) {
 	struct isi_cb_data *cbd = opaque;
 	isi_subsystem_reachable_cb cb = cbd->callback;
 	struct isi_modem *modem = cbd->subsystem;
@@ -84,7 +85,7 @@ void modem_reachable_cb(GIsiClient *client, bool alive, uint16_t object, void *o
 	g_isi_request_make(client, msg, sizeof(msg), MTC_TIMEOUT, mtc_query_cb, modem);
 }
 
-bool mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+gboolean mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_modem *isi = opaque;
 
@@ -104,7 +105,7 @@ bool mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t len, 
 	return true;
 }
 
-bool mtc_power_off_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+gboolean mtc_power_off_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
 	struct isi_modem *isi = opaque;
 
@@ -125,15 +126,15 @@ bool mtc_power_off_cb(GIsiClient *client, const void *restrict data, size_t len,
 	return true;
 }
 
-static void netlink_status_cb(bool up, uint8_t addr, GIsiModem *idx, void *data) {
+static void netlink_status_cb(GIsiModem *idx, GPhonetLinkState state, char const *iface, void *data) {
 	struct isi_cb_data *cbd = data;
 	isi_subsystem_reachable_cb cb = cbd->callback;
 	struct isi_modem *modem = cbd->subsystem;
 	void * user_data = cbd->data;
 
-	g_debug("Phonet is %s, addr=0x%02x, idx=%p\n", up ? "up" : "down", addr, idx);
+	g_debug("Phonet: %s is %s, idx=%p\n", iface, state == PN_LINK_UP ? "up" : "down", idx);
 
-	if(up) {
+	if(state == PN_LINK_UP) {
 		modem->idx = idx;
 		modem->client = g_isi_client_create(idx, PN_MTC);
 
@@ -156,11 +157,24 @@ static void netlink_status_cb(bool up, uint8_t addr, GIsiModem *idx, void *data)
 struct isi_modem* isi_modem_create(char *interface, isi_subsystem_reachable_cb cb, void *user_data) {
 	struct isi_modem *modem = malloc(sizeof(struct isi_modem));
 	struct isi_cb_data *cbd = isi_cb_data_new(modem, cb, user_data);
+	int error;
 
 	if(!modem || !cbd)
 		goto error;
 
-	modem->link = g_pn_netlink_start(netlink_status_cb, interface, cbd);
+	modem->idx = g_isi_modem_by_name(interface);
+	modem->link = g_pn_netlink_start(modem->idx, netlink_status_cb, cbd);
+
+	if(!modem->link)
+		goto error;
+	
+	error = g_pn_netlink_set_address(modem->idx, PN_DEV_SOS);
+	if(error && error != -EEXIST)
+		g_debug("g_pn_netlink_set_address: %s\n", strerror(-error));
+
+	error = g_pn_netlink_add_route(modem->idx, PN_DEV_HOST);
+	if(error && error != -ENOTSUP)
+		g_debug("g_pn_netlink_add_route: %s\n", strerror(-error));
 
 	return modem;
 

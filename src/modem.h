@@ -1,8 +1,9 @@
+#include <stdbool.h>
 #include "gisi/client.h"
 #include "gisi/netlink.h"
 
-#ifndef ISI_MODEM_H
-#define ISI_MODEM_H
+#ifndef _ISI_MODEM_H
+#define _ISI_MODEM_H
 
 typedef void (*isi_subsystem_reachable_cb)(bool error, void *data);
 typedef void (*isi_powerstatus_cb)(bool power, void *data);
