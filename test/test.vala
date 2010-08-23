@@ -6,24 +6,26 @@
 using ISI;
 
 Modem m;
-Network n;
+DeviceInfo n;
 
-void strength_callback(bool error, uint8 strength, void *data) {
+void info_callback(bool error, string msg, void *data) {
 	if(!error)
-		stdout.printf("Strength: %d\n", strength);
+		stdout.printf("%s: %s\n", (string) data, msg);
 }
 
-void network_reachable(bool error, void *data) {
-	stdout.printf("Network Reachable Status: %s\n", error ? "down" : "up");
+void dev_info_reachable(bool error, void *data) {
+	stdout.printf("Device Info Reachable Status: %s\n", error ? "down" : "up");
 	if(!error) {
-		n.request_strength(strength_callback, data);
+		n.query_manufacturer(info_callback, "manufacturer");
+		n.query_model(info_callback, "model");
+		n.query_revision(info_callback, "revision");
 	}
 }
 
 void modem_reachable(bool error, void *data) {
 	stdout.printf("Modem Reachable Status: %s\n", error ? "down" : "up");
 	if(!error) {
-		n = new Network(m, network_reachable, data);
+		n = new DeviceInfo(m, dev_info_reachable, data);
 	}
 }
 
