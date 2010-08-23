@@ -99,7 +99,8 @@ gboolean mtc_power_on_cb(GIsiClient *client, const void *restrict data, size_t l
 
 	if(msg[1] == MTC_OK) {
 		isi->power = TRUE;
-		isi->powerstatus(TRUE, isi->user_data);
+		if(isi->powerstatus)
+				isi->powerstatus(TRUE, isi->user_data);
 	}
 
 	return TRUE;
@@ -132,7 +133,7 @@ static void netlink_status_cb(GIsiModem *idx, GPhonetLinkState state, char const
 	struct isi_modem *modem = cbd->subsystem;
 	void * user_data = cbd->data;
 
-	g_debug("Phonet: %s is %s, idx=%p\n", iface, state == PN_LINK_UP ? "up" : "down", idx);
+	g_debug("Phonet: %s is %s, idx=%p", iface, state == PN_LINK_UP ? "up" : "down", idx);
 
 	if(state == PN_LINK_UP) {
 		modem->idx = idx;
