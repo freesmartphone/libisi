@@ -7,3 +7,8 @@ const char *net_status_name(enum net_reg_status value);
 const char *net_subblock_name(enum net_subblock value);
 const char *net_isi_cause_name(enum net_isi_cause value);
 const char *mtc_modem_state_name(enum mtc_modem_state value);
+
+#ifdef __ISIMODEM_INFO_H
+const char *isi_device_info_subblock_name(enum info_subblock value);
+const char *isi_device_info_isi_cause_name(enum info_isi_cause value);
+#endif
