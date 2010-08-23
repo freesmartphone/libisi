@@ -34,11 +34,11 @@ struct isi_network {
 };
 
 /* callbacks */
-typedef void (*isi_network_status_cb)(bool error, struct network_status *status, void *data);
-typedef void (*isi_network_strength_cb)(bool error, uint8_t strength, void *data);
-typedef void (*isi_network_register_cb)(bool error, void *data);
-typedef void (*isi_network_operator_cb)(bool error, struct network_operator *something, void *data);
-typedef void (*isi_network_operator_list_cb)(bool error, int total, const struct network_operator *list, void *data);
+typedef void (*isi_network_status_cb)(gboolean error, struct network_status *status, void *data);
+typedef void (*isi_network_strength_cb)(gboolean error, guint8 strength, void *data);
+typedef void (*isi_network_register_cb)(gboolean error, void *data);
+typedef void (*isi_network_operator_cb)(gboolean error, struct network_operator *something, void *data);
+typedef void (*isi_network_operator_list_cb)(gboolean error, int total, const struct network_operator *list, void *data);
 
 /* subsystem */
 struct isi_network* isi_network_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);

@@ -165,17 +165,17 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 		/* info message */
 		g_message("Status: %s, LAC: 0x%X, CID: 0x%X, Technology: %d",
 		          net_status_name(st.status), st.lac, st.cid, st.technology);
-		cb(false, &st, user_data);
+		cb(FALSE, &st, user_data);
 		return;
 	}
 
 	error:
-		cb(true, NULL, user_data);
+		cb(TRUE, NULL, user_data);
 }
 
 gboolean reg_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	reg_status_ind_cb(client, data, len, object, opaque);
-	return true;
+	return TRUE;
 }
 
 void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data) {
@@ -187,7 +187,7 @@ void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb
 
 	if(!cbd || !g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, reg_status_resp_cb, nd)) {
 		isi_cb_data_free(cbd);
-		cb(true, NULL, user_data);
+		cb(TRUE, NULL, user_data);
 	}
 }
 
@@ -195,7 +195,7 @@ void isi_network_subscribe_status(struct isi_network *nd, isi_network_status_cb 
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
-		cb(true, 0, user_data);
+		cb(TRUE, 0, user_data);
 	}
 }
 
@@ -212,13 +212,13 @@ void network_rssi_ind_cb(GIsiClient *client, const void *restrict data, size_t l
 	isi_cb_data_free(cbd);
 
 	if(!msg || len < 3 || msg[0] != NET_RSSI_IND) {
-		cb(true, 0, user_data);
+		cb(TRUE, 0, user_data);
 		return;
 	}
 
 	g_message("Strength: %d", msg[1]);
 
-	cb(false, msg[1], user_data);
+	cb(FALSE, msg[1], user_data);
 }
 
 gboolean network_rssi_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
@@ -234,20 +234,20 @@ gboolean network_rssi_resp_cb(GIsiClient *client, const void *restrict data, siz
 
 	if(!msg) {
 		g_warning("ISI client error: %d", g_isi_client_error(client));
-		cb(true, 0, user_data);
-		return true;
+		cb(TRUE, 0, user_data);
+		return TRUE;
 	}
 
 	if (len < 3 || msg[0] != NET_RSSI_GET_RESP) {
-		cb(true, 0, user_data);
-		return false;
+		cb(TRUE, 0, user_data);
+		return FALSE;
 	}
 
 	if (msg[1] != NET_CAUSE_OK) {
 		g_warning("Request failed: %s (0x%02X)",
 			net_isi_cause_name(msg[1]), msg[1]);
-		cb(true, 0, user_data);
-		return true;
+		cb(TRUE, 0, user_data);
+		return TRUE;
 	}
 
 	g_isi_sb_iter_init(&iter, msg, len, 3);
@@ -259,8 +259,8 @@ gboolean network_rssi_resp_cb(GIsiClient *client, const void *restrict data, siz
 
 				if (!g_isi_sb_iter_get_byte(&iter, &rssi, 2)) {
 					g_debug("Could not get next byte!");
-					cb(true, 0, user_data);
-					return true;
+					cb(TRUE, 0, user_data);
+					return TRUE;
 				}
 
 				strength = rssi != 0 ? rssi : -1;
@@ -277,8 +277,8 @@ gboolean network_rssi_resp_cb(GIsiClient *client, const void *restrict data, siz
 	}
 
 	g_message("Strength: %d", strength);
-	cb(false, strength, user_data);
-	return true;
+	cb(FALSE, strength, user_data);
+	return TRUE;
 }
 
 void isi_network_request_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data) {
@@ -293,7 +293,7 @@ void isi_network_request_strength(struct isi_network *nd, isi_network_strength_c
 	if(cbd && g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, network_rssi_resp_cb, cbd))
 		return
 
-	cb(true, 0, user_data);
+	cb(TRUE, 0, user_data);
 	isi_cb_data_free(cbd);
 }
 
@@ -301,7 +301,7 @@ void isi_network_subscribe_strength(struct isi_network *nd, isi_network_strength
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, NET_RSSI_IND, network_rssi_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
-		cb(true, 0, user_data);
+		cb(TRUE, 0, user_data);
 	}
 }
 
@@ -315,7 +315,7 @@ void network_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, v
 
 	if (!alive) {
 		g_critical("Unable to bootstrap network driver");
-		cb(true, cbd->data);
+		cb(TRUE, cbd->data);
 		return;
 	}
 
@@ -324,7 +324,7 @@ void network_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, v
 		g_isi_version_major(client),
 		g_isi_version_minor(client));
 
-	cb(false, cbd->data);
+	cb(FALSE, cbd->data);
 	isi_cb_data_free(cbd);
 }
 
@@ -344,7 +344,7 @@ struct isi_network* isi_network_create(struct isi_modem *modem, isi_subsystem_re
 	return nd;
 
 	error:
-		cb(true, data);
+		cb(TRUE, data);
 		if(nd)
 			free(nd);
 		isi_cb_data_free(cbd);
@@ -377,16 +377,16 @@ gboolean set_manual_resp_cb(GIsiClient *client, const void *restrict data, size_
 		goto error;
 	}
 
-	cb(false, cbd->data);
+	cb(FALSE, cbd->data);
 	nd->last_reg_mode = NET_SELECT_MODE_MANUAL;
 	goto out;
 
 error:
-	cb(true, cbd->data);
+	cb(TRUE, cbd->data);
 
 out:
 	isi_cb_data_free(cbd);
-	return true;
+	return TRUE;
 }
 
 gboolean set_auto_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
@@ -408,16 +408,16 @@ gboolean set_auto_resp_cb(GIsiClient *client, const void *restrict data, size_t 
 		goto error;
 	}
 
-	cb(false, cbd->data);
+	cb(FALSE, cbd->data);
 	nd->last_reg_mode = NET_SELECT_MODE_AUTOMATIC;
 	goto out;
 
 error:
-	cb(false, cbd->data);
+	cb(FALSE, cbd->data);
 
 out:
 	isi_cb_data_free(cbd);
-	return true;
+	return TRUE;
 }
 
 void isi_network_register_manual(struct isi_network *nd, const char *mcc, const char *mnc, isi_network_register_cb cb, void *data) {
@@ -466,14 +466,14 @@ void isi_network_register_auto(struct isi_network *nd, isi_network_register_cb c
 	if(cbd && g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_SET_TIMEOUT, set_auto_resp_cb, cbd))
 		return;
 
-	cb(true, data);
+	cb(TRUE, data);
 	if(cbd)
 		isi_cb_data_free(cbd);
 }
 
 void isi_network_deregister(struct isi_network *nd, isi_network_register_cb cb, void *data) {
 	g_critical("Network deregister is not implemented!");
-	cb(true, data);
+	cb(TRUE, data);
 }
 
 gboolean name_get_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
@@ -492,7 +492,7 @@ gboolean name_get_resp_cb(GIsiClient *client, const void *restrict data, size_t 
 	}
 
 	if(len < 3 || msg[0] != NET_OPER_NAME_READ_RESP)
-		return false;
+		return FALSE;
 
 	if(msg[1] != NET_CAUSE_OK) {
 		g_warning("Request failed: %s", net_isi_cause_name(msg[1]));
@@ -529,15 +529,15 @@ gboolean name_get_resp_cb(GIsiClient *client, const void *restrict data, size_t 
 		g_isi_sb_iter_next(&iter);
 	}
 
-	cb(false, &op, cbd->data);
+	cb(FALSE, &op, cbd->data);
 	goto out;
 
 error:
-	cb(true, NULL, cbd->data);
+	cb(TRUE, NULL, cbd->data);
 
 out:
 	isi_cb_data_free(cbd);
-	return true;
+	return TRUE;
 }
 
 void isi_network_current_operator(struct isi_network *nd, isi_network_operator_cb cb, void *data) {
@@ -555,7 +555,7 @@ void isi_network_current_operator(struct isi_network *nd, isi_network_operator_c
 	if(cbd && g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, name_get_resp_cb, cbd))
 		return;
 
-	cb(true, NULL, data);
+	cb(TRUE, NULL, data);
 	isi_cb_data_free(cbd);
 }
 
@@ -576,7 +576,7 @@ gboolean available_resp_cb(GIsiClient *client, const void *restrict data, size_t
 	}
 
 	if(len < 3 || msg[0] != NET_AVAILABLE_GET_RESP)
-		return false;
+		return FALSE;
 
 	if(msg[1] != NET_CAUSE_OK) {
 		g_warning("Request failed: %s", net_isi_cause_name(msg[1]));
@@ -632,16 +632,16 @@ gboolean available_resp_cb(GIsiClient *client, const void *restrict data, size_t
 	}
 
 	if (common == detail && detail == total) {
-		cb(false, total, list, cbd->data);
+		cb(FALSE, total, list, cbd->data);
 		goto out;
 	}
 
 error:
-	cb(true, 0, NULL, cbd->data);
+	cb(TRUE, 0, NULL, cbd->data);
 
 out:
 	isi_cb_data_free(cbd);
-	return true;
+	return TRUE;
 }
 
 void isi_network_list_operators(struct isi_network *nd, isi_network_operator_list_cb cb, void *data) {
@@ -661,6 +661,6 @@ void isi_network_list_operators(struct isi_network *nd, isi_network_operator_lis
 		return;
 
 error:
-	cb(true, 0, NULL, data);
+	cb(TRUE, 0, NULL, data);
 	isi_cb_data_free(cbd);
 }
