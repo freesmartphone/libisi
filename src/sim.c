@@ -85,7 +85,7 @@ void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void 
 	g_isi_subscribe(client, SIM_IND, sim_ind_cb, user_data);
 
 	/* Check if SIM is ready */
-	isi_sim_read_hplmn(cbd->data);
+	isi_sim_read_hplmn(cbd->subsystem);
 }
 
 struct isi_sim* isi_sim_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
