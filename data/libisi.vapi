@@ -1,6 +1,17 @@
 /*
- * This file is under BSD license (2 clause)
- * Copyright (C) 2010 Sebastian Reichel
+ * Copyright (c) 2010, Sebastian Reichel <sre@ring0.de>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 /**
@@ -235,9 +246,44 @@ namespace ISI {
 	public class USSD { }
 
 	/**
-	 * The Device subsystem of the GSM modem (''not yet implemented'')
+	 * The Device Information subsystem of the GSM modem
 	 */
-	public class Device { }
+	[CCode (cname = "struct isi_device_info", free_function = "isi_device_info_destroy", cheader_filename = "isi/device_info.h")]
+	[Compact]
+	public class DeviceInfo {
+		/**
+		 * Create device information GSM subsystem
+		 */
+		[CCode (cname = "isi_device_info_create")]
+		public DeviceInfo(Modem *modem, subsystem_reachable cb, void *user_data);
+
+		[CCode (cname = "isi_device_info_cb", has_target = false)]
+		public delegate void device_info_cb(bool error, string msg, void *user_data);
+
+		/**
+		 * Query Manufacturer
+		 */
+		[CCode (cname = "isi_device_information_query_manufacturer")]
+		public void query_manufacturer(device_info_cb cb, void *data);
+
+		/**
+		 * Query Model
+		 */
+		[CCode (cname = "isi_device_information_query_model")]
+		public void query_model(device_info_cb cb, void *data);
+
+		/**
+		 * Query Revision
+		 */
+		[CCode (cname = "isi_device_information_query_revision")]
+		public void query_revision(device_info_cb cb, void *data);
+
+		/**
+		 * Query Serial (IMEI)
+		 */
+		[CCode (cname = "isi_device_information_query_serial")]
+		public void query_serial(device_info_cb cb, void *data);
+	}
 
 	/**
 	 * The SIM subsystem of the GSM modem (''not yet implemented'')
