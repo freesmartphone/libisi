@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
-#include <gisi/modem.h>
+#include "modem.h"
 
 struct _GIsiClient;
 typedef struct _GIsiClient GIsiClient;
