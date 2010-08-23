@@ -288,7 +288,15 @@ namespace ISI {
 	/**
 	 * The SIM subsystem of the GSM modem (''not yet implemented'')
 	 */
-	public class SIM { }
+	[CCode (cname = "struct isi_sim", free_function = "isi_sim_destroy", cheader_filename = "isi/sim.h")]
+	[Compact]
+	public class SIM {
+		/**
+		 * Create SIM card GSM subsystem
+		 */
+		[CCode (cname = "isi_sim_create")]
+		public SIM(Modem *modem, subsystem_reachable cb, void *user_data);
+	}
 
 	/**
 	 * The Call subsystem of the GSM modem (''not yet implemented'')
