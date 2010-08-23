@@ -13,9 +13,38 @@
 #include "gisi/iter.h"
 #include "helper.h"
 
-static void sim_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+static gboolean isi_sim_read_hplmn_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
+	struct isi_sim *sim = user_data;
 
+	if (!msg) {
+		g_debug("ISI client error: %d", g_isi_client_error(client));
+		return TRUE;
+	}
+
+	if (len < 3 || msg[0] != SIM_NETWORK_INFO_RESP || msg[1] != READ_HPLMN)
+		return FALSE;
+
+	if (msg[2] != SIM_SERV_NOTREADY) {
+		g_debug("SIM looks OK");
+	}
+
+	return TRUE;
+}
+
+static void isi_sim_read_hplmn(struct isi_sim *sim) {
+	const unsigned char req[] = {
+		SIM_NETWORK_INFO_REQ,
+		READ_HPLMN, 0
+	};
+
+	g_isi_request_make(sim->client, req, sizeof(req), SIM_TIMEOUT, isi_sim_read_hplmn_resp_cb, sim);
+}
+
+static void sim_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = user_data;
+	isi_subsystem_reachable_cb cb = cbd->callback;
 
 	//if(registered)
 	//	return;
@@ -32,6 +61,9 @@ static void sim_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 		default:
 			g_debug("SIM STATE: UNKNOWN");
 	}
+
+	cb(FALSE, cbd->data);
+	isi_cb_data_free(cbd);
 }
 
 void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void *user_data) {
@@ -52,8 +84,8 @@ void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void 
 	
 	g_isi_subscribe(client, SIM_IND, sim_ind_cb, user_data);
 
-	cb(FALSE, cbd->data);
-	isi_cb_data_free(cbd);
+	/* Check if SIM is ready */
+	isi_sim_read_hplmn(user_data);
 }
 
 struct isi_sim* isi_sim_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
