@@ -15,6 +15,7 @@ void info_callback(bool error, string msg, void *data) {
 }
 
 void pin_callback(bool error, ISI.SIM.pin_answer msg, void *data) {
+	message("PIN callback");
 	//if(!error)
 	//	stdout.printf("%s: %s\n", (string) data, msg);
 }
