@@ -83,9 +83,10 @@ void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void 
 		g_isi_version_minor(client));
 
 	g_isi_subscribe(client, SIM_IND, sim_ind_cb, user_data);
+	cb(FALSE, cbd->data);
 
 	/* Check if SIM is ready */
-	isi_sim_read_hplmn(cbd->subsystem);
+	//isi_sim_read_hplmn(cbd->subsystem);
 }
 
 struct isi_sim* isi_sim_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data) {
@@ -121,10 +122,17 @@ void isi_sim_destroy(struct isi_sim *nd) {
 
 static gboolean isi_sim_pin_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
+
+	if (!msg) {
+		g_debug("ISI client error: %d", g_isi_client_error(client));
+		return TRUE;
+	}
+
+	printf("OBJECT: %d\n", object);
 	printf("SIM PIN ANSWER: ");
 	int i;
 	for(i=0; i<len; i++)
-		printf("%c", msg[i]);
+		printf("%02x", msg[i]);
 	printf("\n");
 }
 
@@ -132,6 +140,8 @@ void isi_sim_set_pin(struct isi_sim *nd, char *pin, isi_sim_pin_cb cb, void *use
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	int i;
 	int len = strlen(pin);
+
+	printf("isi_sim_set_pin...\n");
 
 	unsigned char msg[] = {
 		SIM_AUTHENTICATION_REQ, 0x02, 0x00, 0x00, 0x00, 0x00,
@@ -146,9 +156,15 @@ void isi_sim_set_pin(struct isi_sim *nd, char *pin, isi_sim_pin_cb cb, void *use
 		return;
 	}
 
+	printf("Package: ");
+
 	/* insert the PIN into the request */
 	for(i=0; i<len; i++)
 		msg[2+i] = pin[i];
+
+	for(i=0; i<24; i++)
+		printf("%02x", msg[i]);
+	printf("\n");
 
 	if(!cbd)
 		goto error;
