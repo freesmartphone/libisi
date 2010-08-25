@@ -81,7 +81,7 @@ void sim_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void 
 		pn_resource_name(g_isi_client_resource(client)),
 		g_isi_version_major(client),
 		g_isi_version_minor(client));
-	
+
 	g_isi_subscribe(client, SIM_IND, sim_ind_cb, user_data);
 
 	/* Check if SIM is ready */
@@ -116,4 +116,47 @@ void isi_sim_destroy(struct isi_sim *nd) {
 		return;
 	g_isi_client_destroy(nd->client);
 	free(nd);
+}
+
+
+static gboolean isi_sim_pin_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+	const unsigned char *msg = data;
+	printf("SIM PIN ANSWER: ");
+	int i;
+	for(i=0; i<len; i++)
+		printf("%c", msg[i]);
+	printf("\n");
+}
+
+void isi_sim_set_pin(struct isi_sim *nd, char *pin, isi_sim_pin_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+	int i;
+	int len = strlen(pin);
+
+	unsigned char msg[] = {
+		SIM_AUTHENTICATION_REQ, 0x02, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+	/* maximum PIN length (at least according to Nokia's GUI */
+	if(len > 8) {
+		cb(TRUE, SIM_PIN_TOO_LONG, user_data);
+		g_free(cbd);
+		return;
+	}
+
+	/* insert the PIN into the request */
+	for(i=0; i<len; i++)
+		msg[2+i] = pin[i];
+
+	if(!cbd)
+		goto error;
+
+	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_TIMEOUT, isi_sim_pin_resp_cb, cbd))
+		return;
+
+error:
+	cb(TRUE, SIM_PIN_UNKNOWN_ERROR, user_data);
+	g_free(cbd);
 }

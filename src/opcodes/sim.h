@@ -125,6 +125,8 @@ enum sim_pb_tag {
 };
 
 enum sim_message_id {
+	SIM_AUTHENTICATION_REQ = 0x07,
+	//SIM_AUTHENTICATION_RESP = 0x08, // I'm not sure yet
 	SIM_NETWORK_INFO_REQ = 0x19,
 	SIM_NETWORK_INFO_RESP = 0x1A,
 	SIM_IMSI_REQ_READ_IMSI = 0x1D,
@@ -139,8 +141,6 @@ enum sim_message_id {
 	SIM_PB_RESP_SIM_PB_READ = 0xDD,
 	SIM_IND = 0xEF,
 	SIM_COMMON_MESSAGE = 0xF0
-	//SIM_AUTHENTICATION_REQ
-	//SIM_AUTHENTICATION_RESP
 };
 
 enum sim_service_type {

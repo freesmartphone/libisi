@@ -291,11 +291,28 @@ namespace ISI {
 	[CCode (cname = "struct isi_sim", free_function = "isi_sim_destroy", cheader_filename = "isi/sim.h")]
 	[Compact]
 	public class SIM {
+		[CCode (cname = "enum isi_sim_pin_answer")]
+		public enum pin_answer {
+			SIM_PIN_UNKNOWN_ERROR = 0x00,
+			SIM_PIN_OK = 0x01,
+			SIM_PIN_TOO_LONG = 0x02,
+			SIM_PIN_INVALID = 0x03
+		}
+
 		/**
 		 * Create SIM card GSM subsystem
 		 */
 		[CCode (cname = "isi_sim_create")]
 		public SIM(Modem *modem, subsystem_reachable cb, void *user_data);
+
+		[CCode (cname = "isi_sim_pin_cb", has_target = false)]
+		public delegate void pin_cb(bool error, pin_answer code, void *user_data);
+
+		/**
+		 * Set PIN code
+		 */
+		[CCode (cname = "isi_sim_set_pin")]
+		public void set_pin(string pin, pin_cb cb, void *data);
 	}
 
 	/**

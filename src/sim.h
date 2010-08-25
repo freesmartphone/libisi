@@ -4,27 +4,27 @@
 #include "gisi/client.h"
 #include "modem.h"
 
-#ifndef _ISI_DEVICE_INFO_H
-#define _ISI_DEVICE_INFO_H
+#ifndef _ISI_SIM_H
+#define _ISI_SIM_H
 
 struct isi_sim {
 	GIsiClient *client;
 };
 
+enum isi_sim_pin_answer {
+	SIM_PIN_UNKNOWN_ERROR = 0x00,
+	SIM_PIN_OK = 0x01,
+	SIM_PIN_TOO_LONG = 0x02,
+	SIM_PIN_INVALID = 0x03
+};
+
 /* callbacks */
-#if 0
-typedef void (*isi_device_info_cb)(gboolean error, const char *msg, void *user_data);
-#endif
+typedef void (*isi_sim_pin_cb)(gboolean error, enum isi_sim_pin_answer code, void *user_data);
 
 /* subsystem */
 struct isi_sim* isi_sim_create(struct isi_modem *modem, isi_subsystem_reachable_cb cb, void *data);
 void isi_sim_destroy(struct isi_sim *nd);
 
-#if 0
-void isi_device_info_query_manufacturer(struct isi_device_info *nd, isi_device_info_cb cb, void *user_data);
-void isi_device_info_query_model(struct isi_device_info *nd, isi_device_info_cb cb, void *user_data);
-void isi_device_info_query_revision(struct isi_device_info *nd, isi_device_info_cb cb, void *user_data);
-void isi_device_info_query_serial(struct isi_device_info *nd, isi_device_info_cb cb, void *user_data);
-#endif
+void isi_sim_set_pin(struct isi_sim *nd, char *pin, isi_sim_pin_cb cb, void *user_data);
 
 #endif
