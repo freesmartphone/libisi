@@ -1,3 +1,4 @@
 *.so.*
 *.o
 html/
+test/test
