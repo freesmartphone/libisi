@@ -17,6 +17,15 @@
 
 #define _(X) case X: return #X
 
+void print_package(const gchar *name, const unsigned char *msg, size_t len) {
+	int i;
+
+	printf("PKG: %s: ", name);
+	for(i=0; i<len; i++)
+		printf("%02x", msg[i]);
+	printf("\n");
+}
+
 void print_log(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data) {
 	switch(log_level) {
 		case G_LOG_LEVEL_ERROR:
