@@ -21,8 +21,20 @@ isi = Proto("isi", "ISI Modem Control Protocol")
 local fields    = phonet.fields
 local isifields = isi.fields
 
-local device = { [0x00] = "Modem", [0x6c] = "Host" }
-local resource = { [0x01] = "Call", [0x02] = "SMS", [0x09] = "SIM", [0x10] = "Indication", [0x0A] = "Network", [0x15] = "MTC", [0x1B] = "Phone Info" }
+local device = { [0x00] = "Modem", [0x6c] = "Host", [0xFF] = "Any" }
+local resource = {
+	[0x01] = "Call",
+	[0x02] = "SMS",
+	[0x06] = "Subscriber Services",
+	[0x08] = "SIM AUTH",
+	[0x09] = "SIM",
+	[0x0A] = "Network",
+	[0x10] = "Indication",
+	[0x15] = "MTC",
+	[0x1B] = "Phone Info",
+	[0x31] = "GPRS",
+	[0x62] = "EPOC Info"
+}
 
 local mtc_msg_ids = {
 	[0x02] = "MTC_STATE_QUERY_REQ",
