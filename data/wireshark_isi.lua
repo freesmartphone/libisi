@@ -68,19 +68,35 @@ local phone_info_sub_ids = {
 	[0x07] = "INFO_PRODUCT_INFO_MANUFACTURER",
 }
 
+local sim_auth_msg_ids = {
+	[0x07] = "SIM_AUTH_REQ",
+	[0x08] = "SIM_AUTH_SUCCESS_RESP",
+	[0x09] = "SIM_AUTH_FAIL_RESP"
+}
+
+local sim_auth_req = {
+	[0x02] = "SIM_AUTH_REQ_PIN",
+	[0x03] = "SIM_AUTH_REQ_PUK"
+}
+
 fields.rdev = ProtoField.uint8("phonet.receiver", "Receiver Device ID", base.HEX, device)
 fields.sdev = ProtoField.uint8("phonet.sender", "Sender Device ID", base.HEX, device)
 fields.res  = ProtoField.uint8("phonet.resource", "Resource ID", base.HEX, resource)
-fields.len  = ProtoField.uint16("phonet.length","Data Length")
+fields.len  = ProtoField.uint16("phonet.length", "Data Length")
 fields.robj = ProtoField.uint8("phonet.receiver_object", "Receiver Object ID", base.HEX)
 fields.sobj = ProtoField.uint8("phonet.sender_object", "Sender Object ID", base.HEX)
 fields.id   = ProtoField.uint8("phonet.id", "ID")
 
 isifields.MTC      = ProtoField.uint8("isi.cmd", "Command", base.HEX, mtc_msg_ids)
 isifields.INFO     = ProtoField.uint8("isi.cmd", "Command", base.HEX, phone_info_msg_ids)
+isifields.SIM_AUTH = ProtoField.uint8("isi.cmd", "Command", base.HEX, sim_auth_msg_ids)
 
-isifields.COMMON   = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, common_msg_sub_ids)
-isifields.INFO_REQ = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, phone_info_sub_ids)
+isifields.COMMON       = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, common_msg_sub_ids)
+isifields.INFO_REQ     = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, phone_info_sub_ids)
+isifields.SIM_AUTH_REQ = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, sim_auth_req)
+
+isifields.PIN = ProtoField.string("isi.sim.pin", "PIN")
+isifields.PUK = ProtoField.string("isi.sim.puk", "PUK")
 
 isifields.data = ProtoField.bytes("isi.data", "Remaining Data")
 
@@ -102,6 +118,31 @@ end
 function analyze_common(buffer, subtree)
 	subtree:add(isifields.COMMON,buffer(offset, 1))
 	skip()
+end
+
+function analyze_sim_auth(buffer, subtree)
+	local msgid = buffer(offset, 1):uint()
+	subtree:add(isifields.SIM_AUTH, buffer(offset, 1))
+	info = info .. (sim_auth_msg_ids[msgid] or "")
+	skip()
+
+	if msgid == 0x07 then
+		local subcmd = buffer(offset, 1):uint()
+		subtree:add(isifields.SIM_AUTH_REQ, buffer(offset, 1))
+		skip()
+
+		if subcmd == 0x03 then
+			subtree:add(isifields.PUK, buffer(offset, 8))
+			offset = offset + 11
+			dataLength = dataLength - 11
+		end
+
+		if subcmd == 0x02 or subcmd == 0x03 then
+			subtree:add(isifields.PIN, buffer(offset, 8))
+			offset = offset + 11
+			dataLength = dataLength - 11
+		end
+	end
 end
 
 function analyze_mtc(buffer, subtree)
@@ -135,8 +176,6 @@ end
 function phonet.dissector(buffer, pinfo, tree)
 	info = ""
 	offset = 0
-
-	local handled = false
 
 	local subtree = tree:add(phonet, buffer())
 	pinfo.cols.protocol = "Phonet"
@@ -178,13 +217,15 @@ function phonet.dissector(buffer, pinfo, tree)
 	pinfo.cols.src = name_device(source)
 	pinfo.cols.dst = name_device(destination)
 
-	if not handled and resource == 0x15 then -- MTC
-		handled = true
+	if resource == 0x08 then -- SIM AUTH
+		analyze_sim_auth(buffer, subtree2)
+	end
+
+	if resource == 0x15 then -- MTC
 		analyze_mtc(buffer, subtree2)
 	end
 
-	if not handled and resource == 0x1B then -- Phone Info
-		handled = true
+	if resource == 0x1B then -- Phone Info
 		analyze_phone_info(buffer, subtree2)
 	end
 	
