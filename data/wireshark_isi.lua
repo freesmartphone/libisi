@@ -156,6 +156,10 @@ function phonet.dissector(buffer, pinfo, tree)
 
 	dataLength = buffer(offset, 2):uint() - 3
 
+	if buffer:len() ~= pinfo.len - 16 then
+		info = "[BROKEN LENGTH]"
+	end
+
 	subtree:add(fields.len,buffer(offset, 2))
 	offset = offset + 2
 
@@ -186,7 +190,7 @@ function phonet.dissector(buffer, pinfo, tree)
 	
 	-- add remaining data, if any
 	if dataLength > 0 then
-		subtree2:add(isifields.data,buffer(offset, dataLength))
+		subtree2:add(isifields.data,buffer(offset))
 	end
 
 	pinfo.cols.info = info
