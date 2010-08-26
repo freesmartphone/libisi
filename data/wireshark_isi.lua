@@ -141,6 +141,11 @@ function analyze_sim_auth(buffer, subtree)
 			subtree:add(isifields.PIN, buffer(offset, 8))
 			offset = offset + 11
 			dataLength = dataLength - 11
+
+			if subcmd == 0x02 then
+				offset = offset + 11
+				dataLength = dataLength - 11
+			end
 		end
 	end
 end
