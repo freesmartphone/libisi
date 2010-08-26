@@ -44,6 +44,7 @@ const char *pn_resource_name(int value) {
 		_(PN_CALL);
 		_(PN_SMS);
 		_(PN_SIM);
+		_(PN_SIM_AUTH);
 		_(PN_MTC);
 		_(PN_GSS);
 	}

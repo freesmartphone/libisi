@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-#define PN_SIM_PIN		0x08
+#define PN_SIM_AUTH		0x08
 #define PN_SIM			0x09
 
 #define SIM_TIMEOUT		5
