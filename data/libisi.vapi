@@ -299,33 +299,43 @@ namespace ISI {
 	}
 
 	/**
-	 * The SIM subsystem of the GSM modem (''not yet implemented'')
+	 * The SIM Authentication subsystem of the GSM modem
 	 */
-	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "isi/sim.h")]
+	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "isi/simauth.h")]
 	[Compact]
 	public class SIMAuth {
-		[CCode (cname = "enum isi_sim_pin_answer")]
-		public enum pin_answer {
-			SIM_PIN_UNKNOWN_ERROR = 0x00,
-			SIM_PIN_OK = 0x01,
-			SIM_PIN_TOO_LONG = 0x02,
-			SIM_PIN_INVALID = 0x03
+		[CCode (cname = "enum isi_sim_auth_answer")]
+		public enum auth_answer {
+			SIM_AUTH_OK,
+			SIM_AUTH_UNKNOWN_ERROR,
+			SIM_AUTH_TIMEOUT_ERROR,
+			SIM_AUTH_PIN_TOO_LONG,
+			SIM_AUTH_PUK_TOO_LONG,
+			SIM_AUTH_PIN_INVALID,
+			SIM_AUTH_PUK_INVALID,
+			SIM_AUTH_NEED_PUK
 		}
 
 		/**
 		 * Create SIM auth GSM subsystem
 		 */
 		[CCode (cname = "isi_sim_auth_create")]
-		public SIMAuth(Modem *modem, subsystem_reachable cb, void *user_data);
+		public SIMAuth(Modem *modem);
 
-		[CCode (cname = "isi_sim_pin_cb", has_target = false)]
-		public delegate void pin_cb(bool error, pin_answer code, void *user_data);
+		[CCode (cname = "isi_sim_auth_cb", has_target = false)]
+		public delegate void auth_cb(auth_answer code, void *user_data);
 
 		/**
 		 * Set PIN code
 		 */
 		[CCode (cname = "isi_sim_auth_set_pin")]
-		public void set_pin(string pin, pin_cb cb, void *data);
+		public void set_pin(string pin, auth_cb cb, void *data);
+
+		/**
+		 * Set PUK code
+		 */
+		[CCode (cname = "isi_sim_auth_set_puk")]
+		public void set_puk(string puk, string pin, auth_cb cb, void *data);
 	}
 
 	/**

@@ -26,7 +26,6 @@
 extern "C" {
 #endif
 
-#define PN_SIM_AUTH		0x08
 #define PN_SIM			0x09
 
 #define SIM_TIMEOUT		5
@@ -127,8 +126,6 @@ enum sim_pb_tag {
 };
 
 enum sim_message_id {
-	SIM_AUTHENTICATION_REQ = 0x07,
-	//SIM_AUTHENTICATION_RESP = 0x08, // I'm not sure yet
 	SIM_NETWORK_INFO_REQ = 0x19,
 	SIM_NETWORK_INFO_RESP = 0x1A,
 	SIM_IMSI_REQ_READ_IMSI = 0x1D,
