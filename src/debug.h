@@ -1,6 +1,7 @@
 #include "opcodes/mtc.h"
 #include "opcodes/network.h"
 
+void print_package(const gchar *name, const unsigned char *msg, size_t len);
 void print_log(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data);
 const char *pn_resource_name(int value);
 const char *net_status_name(enum net_reg_status value);
