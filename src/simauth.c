@@ -24,21 +24,25 @@
 #include "gisi/iter.h"
 #include "helper.h"
 
-void sim_auth_reachable_cb(GIsiClient *client, gboolean alive, uint16_t object, void *user_data) {
+static gboolean sim_auth_reachable_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = user_data;
 	isi_subsystem_reachable_cb cb = cbd->callback;
 
-	if (!alive) {
-		g_critical("Unable to bootstrap SIM Authentication driver");
+	g_debug("%s reachable", pn_resource_name(g_isi_client_resource(client)));
+
+	if (!msg) {
+		g_debug("ISI client error: %d", g_isi_client_error(client));
 		cb(TRUE, cbd->data);
 		isi_cb_data_free(cbd);
-		return;
+		return TRUE;
 	}
 
-	g_debug("%s (v%03d.%03d) reachable",
-		pn_resource_name(g_isi_client_resource(client)),
-		g_isi_version_major(client),
-		g_isi_version_minor(client));
+	printf("SIM AUTH ANSWER: ");
+	int i;
+	for(i=0; i<len; i++)
+		printf("%02x", msg[i]);
+	printf("\n");
 
 	cb(FALSE, cbd->data);
 }
@@ -55,7 +59,13 @@ struct isi_sim_auth* isi_sim_auth_create(struct isi_modem *modem, isi_subsystem_
 	if(!nd->client)
 		goto error;
 
-	g_isi_verify(nd->client, sim_auth_reachable_cb, cbd);
+	/* TODO: sscd uses this magic byte, there is no documentation for it */
+	unsigned char msg[] = {
+		0x11, 0x00, 0x00
+	};
+
+	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_TIMEOUT, sim_auth_reachable_cb, cbd))
+		goto error;
 
 	return nd;
 
