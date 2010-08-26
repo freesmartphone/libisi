@@ -16,6 +16,7 @@ void info_callback(bool error, string msg, void *data) {
 
 void pin_callback(ISI.SIMAuth.auth_answer msg, void *data) {
 	message("PIN callback");
+	message("Answer: %d", msg);
 	//if(!error)
 	//	stdout.printf("%s: %s\n", (string) data, msg);
 }

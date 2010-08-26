@@ -100,21 +100,41 @@ void isi_sim_auth_destroy(struct isi_sim_auth *nd) {
 
 static gboolean isi_sim_auth_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = user_data;
+	isi_sim_auth_cb cb = cbd->callback;
+
 
 	if (!msg) {
 		g_debug("ISI client error: %d", g_isi_client_error(client));
 		return TRUE;
 	}
 
-	if(msg[0] == 0x09) {
-		g_debug("isi_sim_auth_resp_cb: FAILURE");
+	if(msg[0] == SIM_AUTHENTICATION_FAIL_RESP) {
+		switch(msg[1]) {
+			case SIM_AUTHENTICATION_ERROR_INVALID_PW:
+				cb(SIM_AUTH_PW_INVALID, cbd->data);
+				break;
+			case SIM_AUTHENTICATION_ERROR_NEED_PUK:
+				cb(SIM_AUTH_NEED_PUK, cbd->data);
+				break;
+			default:
+				g_warning("UNKNOWN SIM AUTH RESPONSE: 0x080x%02x", msg[1]);
+				cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
+				break;
+		}
+	} else if(msg[0] == SIM_AUTHENTICATION_SUCCESS_RESP) {
+		if(msg[1] == 0x63)
+			cb(SIM_AUTH_OK, cbd->data);
+		else {
+			g_warning("UNKNOWN SIM AUTH RESPONSE: 0x080x%02x", msg[1]);
+			cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
+		}
+	} else {
+		g_warning("UNKNOWN SIM AUTH RESPONSE");
+		print_package("SIM_PIN", msg, len);
+		cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
 	}
 
-	if(msg[0] == 0x08) {
-		g_debug("isi_sim_auth_resp_cb: OK");
-	}
-
-	print_package("SIM_PIN", msg, len);
 }
 
 void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb, void *user_data) {
