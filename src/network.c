@@ -167,6 +167,9 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 		          net_status_name(st.status), st.lac, st.cid, st.technology);
 		if(cb)
 			cb(FALSE, &st, user_data);
+		else
+			g_warning("no callback defined!");
+
 		return;
 	}
 
