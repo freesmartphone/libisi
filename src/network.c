@@ -136,7 +136,6 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 	struct isi_network *nd = cbd->subsystem;
 	isi_network_status_cb cb = cbd->callback;
 	void *user_data = cbd->data;
-	isi_cb_data_free(cbd);
 	struct network_status st;
 	st.status = -1;
 	st.lac = -1;
@@ -146,6 +145,11 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 	if(!msg) {
 		g_warning("ISI client error: %d", g_isi_client_error(client));
 		goto error;
+	}
+
+	if(!cb) {
+		g_warning("no callback defined!");
+		return;
 	}
 
 	/* package too small */
@@ -165,11 +169,7 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 		/* info message */
 		g_message("Status: %s, LAC: 0x%X, CID: 0x%X, Technology: %d",
 		          net_status_name(st.status), st.lac, st.cid, st.technology);
-		if(cb)
-			cb(FALSE, &st, user_data);
-		else
-			g_warning("no callback defined!");
-
+		cb(FALSE, &st, user_data);
 		return;
 	}
 
@@ -179,6 +179,7 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 
 gboolean reg_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	reg_status_ind_cb(client, data, len, object, opaque);
+	isi_cb_data_free(opaque);
 	return TRUE;
 }
 
@@ -197,7 +198,7 @@ void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb
 
 void isi_network_subscribe_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
-	if(!cbd || !g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
+	if(!cbd || g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
 		cb(TRUE, 0, user_data);
 	}
@@ -213,7 +214,6 @@ void network_rssi_ind_cb(GIsiClient *client, const void *restrict data, size_t l
 	struct isi_network *nd = cbd->subsystem;
 	isi_network_strength_cb cb = cbd->callback;
 	void *user_data = cbd->data;
-	isi_cb_data_free(cbd);
 
 	if(!msg || len < 3 || msg[0] != NET_RSSI_IND) {
 		cb(TRUE, 0, user_data);
