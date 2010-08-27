@@ -190,7 +190,7 @@ void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb
 		NET_REG_STATUS_GET_REQ
 	};
 
-	if(!cbd || !g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, reg_status_resp_cb, nd)) {
+	if(!cbd || !g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, reg_status_resp_cb, cbd)) {
 		isi_cb_data_free(cbd);
 		cb(TRUE, NULL, user_data);
 	}
