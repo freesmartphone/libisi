@@ -197,7 +197,7 @@ void isi_network_request_status(struct isi_network *nd, isi_network_status_cb cb
 
 void isi_network_subscribe_status(struct isi_network *nd, isi_network_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
-	if(!cbd || g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
+	if(!cbd || !g_isi_subscribe(nd->client, NET_REG_STATUS_IND, reg_status_ind_cb, nd)) {
 		isi_cb_data_free(cbd);
 		cb(TRUE, 0, user_data);
 	}
