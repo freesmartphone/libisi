@@ -105,7 +105,7 @@ namespace ISI {
 		/**
 		 * Data send to network status callback
 		 */
-		[CCode (cname = "network_status")]
+		[CCode (cname = "struct network_status")]
 		public struct status {
 			/**
 			 * Network Registration Status
@@ -128,20 +128,20 @@ namespace ISI {
 		/**
 		 * Data send to network operator callback
 		 */
-		[CCode (cname = "network_operator")]
+		[CCode (cname = "struct network_operator")]
 		public struct operator {
 			/**
 			 * Network Operator Name
 			 */
-			char *name;
+			string name;
 			/**
 			 * Mobile Country Code
 			 */
-			char *mcc;
+			string mcc;
 			/**
 			 * Mobile Network Code
 			 */
-			char *mnc;
+			string mnc;
 			/**
 			 * Status Code (not set by current_operator method)
 			 */
@@ -306,13 +306,13 @@ namespace ISI {
 	public class SIMAuth {
 		[CCode (cname = "enum isi_sim_auth_answer")]
 		public enum auth_answer {
-			SIM_AUTH_OK,
-			SIM_AUTH_UNKNOWN_ERROR,
-			SIM_AUTH_TIMEOUT_ERROR,
-			SIM_AUTH_PIN_TOO_LONG,
-			SIM_AUTH_PUK_TOO_LONG,
-			SIM_AUTH_PW_INVALID,
-			SIM_AUTH_NEED_PUK
+			OK,
+			UNKNOWN_ERROR,
+			TIMEOUT_ERROR,
+			PIN_TOO_LONG,
+			PUK_TOO_LONG,
+			PW_INVALID,
+			NEED_PUK
 		}
 
 		/**
@@ -332,6 +332,10 @@ namespace ISI {
 
 		/**
 		 * Set PUK code
+		 * @param puk The PUK code
+		 * @param pin The new PIN code
+		 * @param auth_cb This callback with the status feedback
+		 * @param user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_puk")]
 		public void set_puk(string puk, string pin, auth_cb cb, void *data);
