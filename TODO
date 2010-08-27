@@ -1,3 +1,16 @@
+[common]
+* cbd needs to be free'd on unsubscribe
+
 [network]
 * signal RAT
-* we need to free cbd on unsubscribe
+
+[simauth]
+* get status
+* subscribe status
+* unsubscribe status
+
+[sim]
+* imsi
+* issuer
+* phonebook
+* messages
