@@ -165,7 +165,8 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 		/* info message */
 		g_message("Status: %s, LAC: 0x%X, CID: 0x%X, Technology: %d",
 		          net_status_name(st.status), st.lac, st.cid, st.technology);
-		cb(FALSE, &st, user_data);
+		if(cb)
+			cb(FALSE, &st, user_data);
 		return;
 	}
 
