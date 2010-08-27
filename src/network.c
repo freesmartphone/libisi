@@ -295,7 +295,7 @@ void isi_network_request_strength(struct isi_network *nd, isi_network_strength_c
 	};
 
 	if(cbd && g_isi_request_make(nd->client, msg, sizeof(msg), NETWORK_TIMEOUT, network_rssi_resp_cb, cbd))
-		return
+		return;
 
 	cb(TRUE, 0, user_data);
 	isi_cb_data_free(cbd);

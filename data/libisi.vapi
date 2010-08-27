@@ -155,7 +155,7 @@ namespace ISI {
 		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
 
 		[CCode (cname = "isi_network_status_cb", has_target = false)]
-		public delegate void status_cb(bool error, status *status, void *user_data);
+		public delegate void status_cb(bool error, status status, void *user_data);
 
 		[CCode (cname = "isi_network_strength_cb", has_target = false)]
 		public delegate void strength_cb(bool error, uint8 strength, void *user_data);
