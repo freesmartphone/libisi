@@ -18,9 +18,48 @@ void operator_list_callback(bool error, Network.operator[] operators, void *user
 	}
 }
 
+void register_callback(bool error, void *user_data) {
+	if(!error)
+		message("You are now in Auto Register mode");
+	else
+		warning("Switching to Auto Registration mode failed");
+}
+
+void status_callback(bool error, Network.status status, void *user_data) {
+	if(!error) {
+		message("STATUS: LAC: %d, CID: %d", status.lac, status.cid);
+	} else {
+		warning("ERROR: Network Status failed!");
+	}
+}
+
+void strength_callback(bool error, uint8 strength, void *user_data) {
+	if(!error) {
+		message("Signal Strength: %d", strength);
+	} else {
+		warning("ERROR: Network Strength failed!");
+	}
+}
+
+void operator_callback(bool error, Network.operator op, void *user_data) {
+	if(!error) {
+		message("Current Provider: Name: %s, MCC: %s, MNC: %s", op.name, op.mcc, op.mnc);
+	} else {
+		warning("ERROR: Could not get information about current Network operator");
+	}
+}
+
 void network_reachable(bool error, void *data) {
 	if(!error) {
-		n.list_operators(operator_list_callback, data);
+		/* the following commands are all working, but will spam your terminal */
+
+		//n.subscribe_status(status_callback, data);
+		//n.subscribe_strength(strength_callback, data);
+		//n.list_operators(operator_list_callback, data);
+		//n.register_auto(register_callback, data);
+		//n.request_status(status_callback, data);
+		//n.request_strength(strength_callback, data);
+		//n.current_operator(operator_callback, data);
 	} else {
 		warning("Could not create network object");
 	}
