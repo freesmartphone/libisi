@@ -633,12 +633,12 @@ gboolean available_resp_cb(GIsiClient *client, const void *restrict data, size_t
 	}
 
 	if (common == detail && detail == total) {
-		cb(FALSE, total, list, cbd->data);
+		cb(FALSE, list, total, cbd->data);
 		goto out;
 	}
 
 error:
-	cb(TRUE, 0, NULL, cbd->data);
+	cb(TRUE, NULL, 0, cbd->data);
 
 out:
 	isi_cb_data_free(cbd);
@@ -662,6 +662,6 @@ void isi_network_list_operators(struct isi_network *nd, isi_network_operator_lis
 		return;
 
 error:
-	cb(TRUE, 0, NULL, data);
+	cb(TRUE, NULL, 0, data);
 	isi_cb_data_free(cbd);
 }

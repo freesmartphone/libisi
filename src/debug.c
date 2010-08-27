@@ -12,6 +12,7 @@
 #include "opcodes/call.h"
 #include "opcodes/sms.h"
 #include "opcodes/sim.h"
+#include "opcodes/simauth.h"
 #include "opcodes/mtc.h"
 #include "opcodes/gss.h"
 
