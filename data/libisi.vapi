@@ -164,7 +164,7 @@ namespace ISI {
 		public delegate void register_cb(bool error, void *user_data);
 
 		[CCode (cname = "isi_network_operator_cb", has_target = false)]
-		public delegate void operator_cb(bool error, operator *operator, void *user_data);
+		public delegate void operator_cb(bool error, operator operator, void *user_data);
 
 		[CCode (cname = "isi_network_operator_list_cb", has_target = false)]
 		public delegate void operator_list_cb(bool error, operator[] operators, void *user_data);
