@@ -303,7 +303,7 @@ void isi_network_request_strength(struct isi_network *nd, isi_network_strength_c
 
 void isi_network_subscribe_strength(struct isi_network *nd, isi_network_strength_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
-	if(!cbd || g_isi_subscribe(nd->client, NET_RSSI_IND, network_rssi_ind_cb, nd)) {
+	if(!cbd || g_isi_subscribe(nd->client, NET_RSSI_IND, network_rssi_ind_cb, cbd)) {
 		isi_cb_data_free(cbd);
 		cb(TRUE, 0, user_data);
 	}
