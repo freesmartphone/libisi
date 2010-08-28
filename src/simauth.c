@@ -232,7 +232,7 @@ void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_cb cb, 
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, SIM_AUTH_STATUS_IND, sim_auth_ind_cb, cbd)) {
 		isi_cb_data_free(cbd);
-		cb(TRUE, 0, user_data);
+		cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
 	}
 }
 
