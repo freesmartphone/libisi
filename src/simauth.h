@@ -31,5 +31,7 @@ typedef void (*isi_sim_auth_cb)(enum isi_sim_auth_answer code, void *user_data);
 /* methods */
 void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb, void *user_data);
 void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim_auth_cb cb, void *user_data);
+void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_cb cb, void *user_data);
+void isi_sim_auth_unsubscribe_status(struct isi_sim_auth *nd);
 
 #endif
