@@ -71,7 +71,10 @@ local phone_info_sub_ids = {
 local sim_auth_msg_ids = {
 	[0x07] = "SIM_AUTH_REQ",
 	[0x08] = "SIM_AUTH_SUCCESS_RESP",
-	[0x09] = "SIM_AUTH_FAIL_RESP"
+	[0x09] = "SIM_AUTH_FAIL_RESP",
+	[0x10] = "SIM_AUTH_STATUS_IND",
+	[0x11] = "SIM_AUTH_STATUS_REQ",
+	[0x12] = "SIM_AUTH_STATUS_RESP"
 }
 
 local sim_auth_req = {
@@ -147,6 +150,11 @@ function analyze_sim_auth(buffer, subtree)
 				dataLength = dataLength - 11
 			end
 		end
+	end
+
+	if msgid == 0x11 then
+		skip()
+		skip()
 	end
 end
 
