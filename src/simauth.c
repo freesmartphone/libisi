@@ -26,7 +26,8 @@
 
 #if 0
 
-	FIXME: this is some stuff maemo sends quite often :/
+	TODO: I guess this is a status request
+	TODO: we also need status indication, see network.c to get info how they look like
 
 	/* TODO: sscd uses this magic byte, there is no documentation for it, seems to be some status request */
 	unsigned char msg[] = {
@@ -109,12 +110,12 @@ static gboolean isi_sim_auth_resp_cb(GIsiClient *client, const void *restrict da
 		return TRUE;
 	}
 
-	if(msg[0] == SIM_AUTHENTICATION_FAIL_RESP) {
+	if(msg[0] == SIM_AUTH_FAIL_RESP) {
 		switch(msg[1]) {
-			case SIM_AUTHENTICATION_ERROR_INVALID_PW:
+			case SIM_AUTH_ERROR_INVALID_PW:
 				cb(SIM_AUTH_PW_INVALID, cbd->data);
 				break;
-			case SIM_AUTHENTICATION_ERROR_NEED_PUK:
+			case SIM_AUTH_ERROR_NEED_PUK:
 				cb(SIM_AUTH_NEED_PUK, cbd->data);
 				break;
 			default:
@@ -122,7 +123,7 @@ static gboolean isi_sim_auth_resp_cb(GIsiClient *client, const void *restrict da
 				cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
 				break;
 		}
-	} else if(msg[0] == SIM_AUTHENTICATION_SUCCESS_RESP) {
+	} else if(msg[0] == SIM_AUTH_SUCCESS_RESP) {
 		if(msg[1] == 0x63)
 			cb(SIM_AUTH_OK, cbd->data);
 		else {
@@ -143,7 +144,7 @@ void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb
 	int i;
 
 	unsigned char msg[] = {
-		SIM_AUTHENTICATION_REQ, SIM_AUTHENTICATION_REQ_PIN,
+		SIM_AUTH_REQ, SIM_AUTH_REQ_PIN,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
@@ -176,7 +177,7 @@ void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim
 	int i;
 
 	unsigned char msg[] = {
-		SIM_AUTHENTICATION_REQ, SIM_AUTHENTICATION_REQ_PUK,
+		SIM_AUTH_REQ, SIM_AUTH_REQ_PUK,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00
@@ -210,3 +211,32 @@ error:
 	cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
 	g_free(cbd);
 }
+
+void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = opaque;
+	struct isi_network *nd = cbd->subsystem;
+	isi_sim_auth_cb cb = cbd->callback;
+	void *user_data = cbd->data;
+
+	if(!msg || len < 3 || msg[0] != SIM_AUTH_STATUS_IND) {
+		cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
+		return;
+	}
+
+	print_package("SIMAUTH", msg, len);
+}
+
+
+void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+	if(!cbd || g_isi_subscribe(nd->client, SIM_AUTH_STATUS_IND, sim_auth_ind_cb, cbd)) {
+		isi_cb_data_free(cbd);
+		cb(TRUE, 0, user_data);
+	}
+}
+
+void isi_sim_auth_unsubscribe_status(struct isi_sim_auth *nd) {
+	g_isi_unsubscribe(nd->client, SIM_AUTH_STATUS_IND);
+}
+
