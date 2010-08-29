@@ -365,7 +365,7 @@ namespace ISI {
 		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_request_status")]
-		public void request_status(status_cb cb, void *data);
+		public void request_status(auth_status_cb cb, void *data);
 
 		/**
 		 * Subscribe to status changing notifications
