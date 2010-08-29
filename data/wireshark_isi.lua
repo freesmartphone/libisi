@@ -33,6 +33,7 @@ local resource = {
 	[0x15] = "MTC",
 	[0x1B] = "Phone Info",
 	[0x31] = "GPRS",
+	[0x54] = "GPS",
 	[0x62] = "EPOC Info"
 }
 
