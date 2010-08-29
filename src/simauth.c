@@ -113,14 +113,14 @@ static gboolean isi_sim_auth_resp_cb(GIsiClient *client, const void *restrict da
 	if(msg[0] == SIM_AUTH_FAIL_RESP) {
 		switch(msg[1]) {
 			case SIM_AUTH_ERROR_INVALID_PW:
-				cb(SIM_AUTH_PW_INVALID, cbd->data);
+				cb(SIM_AUTH_ERR_INVALID, cbd->data);
 				break;
 			case SIM_AUTH_ERROR_NEED_PUK:
-				cb(SIM_AUTH_NEED_PUK, cbd->data);
+				cb(SIM_AUTH_ERR_NEED_PUK, cbd->data);
 				break;
 			default:
 				g_warning("UNKNOWN SIM AUTH RESPONSE: 0x080x%02x", msg[1]);
-				cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
+				cb(SIM_AUTH_ERR_UNKNOWN, cbd->data);
 				break;
 		}
 	} else if(msg[0] == SIM_AUTH_SUCCESS_RESP) {
@@ -128,12 +128,12 @@ static gboolean isi_sim_auth_resp_cb(GIsiClient *client, const void *restrict da
 			cb(SIM_AUTH_OK, cbd->data);
 		else {
 			g_warning("UNKNOWN SIM AUTH RESPONSE: 0x080x%02x", msg[1]);
-			cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
+			cb(SIM_AUTH_ERR_UNKNOWN, cbd->data);
 		}
 	} else {
 		g_warning("UNKNOWN SIM AUTH RESPONSE");
 		print_package("SIM_PIN", msg, len);
-		cb(SIM_AUTH_UNKNOWN_ERROR, cbd->data);
+		cb(SIM_AUTH_ERR_UNKNOWN, cbd->data);
 	}
 
 }
@@ -151,7 +151,7 @@ void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb
 	};
 
 	if(len > SIM_MAX_PIN_LENGTH) {
-		cb(SIM_AUTH_PIN_TOO_LONG, user_data);
+		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
 		g_free(cbd);
 		return;
 	}
@@ -166,7 +166,7 @@ void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb
 		return;
 
 error:
-	cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
+	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
 	g_free(cbd);
 }
 
@@ -184,13 +184,13 @@ void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim
 	};
 
 	if(pinlen > SIM_MAX_PIN_LENGTH) {
-		cb(SIM_AUTH_PIN_TOO_LONG, user_data);
+		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
 		g_free(cbd);
 		return;
 	}
 
 	if(puklen > SIM_MAX_PUK_LENGTH) {
-		cb(SIM_AUTH_PUK_TOO_LONG, user_data);
+		cb(SIM_AUTH_ERR_PUK_TOO_LONG, user_data);
 		g_free(cbd);
 		return;
 	}
@@ -208,7 +208,7 @@ void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim
 		return;
 
 error:
-	cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
+	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
 	g_free(cbd);
 }
 
@@ -216,27 +216,75 @@ void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, 
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = opaque;
 	struct isi_network *nd = cbd->subsystem;
-	isi_sim_auth_cb cb = cbd->callback;
+	isi_sim_auth_status_cb cb = cbd->callback;
 	void *user_data = cbd->data;
 
 	if(!msg || len < 3 || msg[0] != SIM_AUTH_STATUS_IND) {
-		cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
+		cb(SIM_AUTH_STATUS_ERROR, user_data);
 		return;
 	}
 
-	print_package("SIMAUTH", msg, len);
+	switch(msg[1]) {
+		case SIM_AUTH_IND_NEED_AUTH:
+			switch(msg[2]) {
+				case SIM_AUTH_IND_PIN:
+					cb(SIM_AUTH_STATUS_NEED_PIN, user_data);
+					break;
+				case SIM_AUTH_IND_PUK:
+					cb(SIM_AUTH_STATUS_NEED_PUK, user_data);
+					break;
+				default:
+					print_package("SIM Auth Indication Package", msg, len);
+					break;
+			}
+			break;
+		case SIM_AUTH_IND_NEED_NO_AUTH:
+			cb(SIM_AUTH_STATUS_NEED_NONE, user_data);
+			break;
+		case SIM_AUTH_IND_VALID:
+			switch(msg[2]) {
+				case SIM_AUTH_IND_PIN:
+					cb(SIM_AUTH_STATUS_VALID_PIN, user_data);
+					break;
+				case SIM_AUTH_IND_PUK:
+					cb(SIM_AUTH_STATUS_VALID_PUK, user_data);
+					break;
+				default:
+					print_package("SIM Auth Indication Package", msg, len);
+					break;
+			}
+			break;
+		case SIM_AUTH_IND_INVALID:
+			switch(msg[2]) {
+				case SIM_AUTH_IND_PIN:
+					cb(SIM_AUTH_STATUS_INVALID_PIN, user_data);
+					break;
+				case SIM_AUTH_IND_PUK:
+					cb(SIM_AUTH_STATUS_INVALID_PUK, user_data);
+					break;
+				default:
+					print_package("SIM Auth Indication Package", msg, len);
+					break;
+			}
+			break;
+		case SIM_AUTH_IND_AUTHORIZED:
+			cb(SIM_AUTH_STATUS_AUTHORIZED, user_data);
+			break;
+		default:
+			print_package("SIM Auth Indication Package", msg, len);
+			break;
+	}
+
 }
 
-
-void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_cb cb, void *user_data) {
+void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, SIM_AUTH_STATUS_IND, sim_auth_ind_cb, cbd)) {
 		isi_cb_data_free(cbd);
-		cb(SIM_AUTH_UNKNOWN_ERROR, user_data);
+		cb(SIM_AUTH_STATUS_ERROR, user_data);
 	}
 }
 
 void isi_sim_auth_unsubscribe_status(struct isi_sim_auth *nd) {
 	g_isi_unsubscribe(nd->client, SIM_AUTH_STATUS_IND);
 }
-

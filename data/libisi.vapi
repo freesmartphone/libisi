@@ -304,15 +304,28 @@ namespace ISI {
 	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "isi/simauth.h")]
 	[Compact]
 	public class SIMAuth {
-		[CCode (cname = "enum isi_sim_auth_answer")]
+		[CCode (cname = "enum isi_sim_auth_answer", cprefix="SIM_AUTH_")]
 		public enum auth_answer {
 			OK,
-			UNKNOWN_ERROR,
-			TIMEOUT_ERROR,
-			PIN_TOO_LONG,
-			PUK_TOO_LONG,
-			PW_INVALID,
-			NEED_PUK
+			ERR_UNKNOWN,
+			ERR_PIN_TOO_LONG,
+			ERR_PUK_TOO_LONG,
+			ERR_INVALID,
+			ERR_NEED_PUK
+		}
+
+		[CCode (cname = "enum isi_sim_auth_status", cprefix="SIM_AUTH_STATUS_")]
+		public enum auth_status {
+			ERROR,
+			NO_SIM,
+			NEED_NONE,
+			NEED_PIN,
+			NEED_PUK,
+			VALID_PIN,
+			VALID_PUK,
+			INVALID_PIN,
+			INVALID_PUK,
+			AUTHORIZED
 		}
 
 		/**
@@ -324,8 +337,14 @@ namespace ISI {
 		[CCode (cname = "isi_sim_auth_cb", has_target = false)]
 		public delegate void auth_cb(auth_answer code, void *user_data);
 
+		[CCode (cname = "isi_sim_auth_status_cb", has_target = false)]
+		public delegate void auth_status_cb(auth_status code, void *user_data);
+
 		/**
 		 * Set PIN code
+		 * @param pin The PIN code
+		 * @param auth_cb The callback with the status feedback
+		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_pin")]
 		public void set_pin(string pin, auth_cb cb, void *data);
@@ -334,8 +353,8 @@ namespace ISI {
 		 * Set PUK code
 		 * @param puk The PUK code
 		 * @param pin The new PIN code
-		 * @param auth_cb This callback with the status feedback
-		 * @param user data for the callback
+		 * @param auth_cb The callback with the status feedback
+		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_puk")]
 		public void set_puk(string puk, string pin, auth_cb cb, void *data);
@@ -345,7 +364,7 @@ namespace ISI {
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_sim_auth_subscribe_status")]
-		public void subscribe_status(auth_cb cb, void *data);
+		public void subscribe_status(auth_status_cb cb, void *data);
 
 		/**
 		 * Unsubscribe from status changing notifications

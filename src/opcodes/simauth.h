@@ -47,6 +47,20 @@ enum sim_auth_errror_id {
 	SIM_AUTH_ERROR_NEED_PUK   = 0x18
 };
 
+enum sim_auth_ind_id {
+	SIM_AUTH_IND_NEED_AUTH    = 0x01,
+	SIM_AUTH_IND_NEED_NO_AUTH = 0x02,
+	SIM_AUTH_IND_VALID        = 0x03,
+	SIM_AUTH_IND_INVALID      = 0x04,
+	SIM_AUTH_IND_AUTHORIZED   = 0x05
+};
+
+enum sim_auth_ind_type {
+	SIM_AUTH_IND_PIN = 0x02,
+	SIM_AUTH_IND_PUK = 0x03,
+	SIM_AUTH_IND_OK  = 0x63
+};
+
 #ifdef __cplusplus
 };
 #endif
