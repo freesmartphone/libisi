@@ -160,20 +160,24 @@ error:
 	g_free(cbd);
 }
 
-static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
-	struct isi_cb_data *cbd = user_data;
+	struct isi_cb_data *cbd = opaque;
+
 	isi_sim_auth_status_cb cb = cbd->callback;
+	void *user_data = cbd->data;
+	isi_cb_data_free(cbd);
+
 
 	if(!cb) {
 		g_warning("isi_sim_auth_status_resp_cb: no callback defined");
-		goto error;
+		return TRUE;
 	}
 
 	if (!msg) {
 		g_warning("ISI client error: %d", g_isi_client_error(client));
-		cb(SIM_AUTH_STATUS_ERROR, cbd->data);
-		goto error;
+		cb(SIM_AUTH_STATUS_ERROR, user_data);
+		return TRUE;
 	}
 
 	switch(msg[1]) {
@@ -183,17 +187,30 @@ static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *rest
 		case SIM_AUTH_STATUS_RESP_NEED_PUK:
 			cb(SIM_AUTH_STATUS_NEED_PUK, user_data);
 			break;
+		case SIM_AUTH_STATUS_RESP_RUNNING:
+			switch(msg[2]) {
+				case SIM_AUTH_STATUS_RESP_RUNNING_AUTHORIZED:
+					cb(SIM_AUTH_STATUS_AUTHORIZED, user_data);
+					break;
+				case SIM_AUTH_STATUS_RESP_RUNNING_NO_SIM:
+					cb(SIM_AUTH_STATUS_NO_SIM, user_data);
+					break;
+				default:
+					print_package("SIM Auth Response Package", msg, len);
+					cb(SIM_AUTH_STATUS_ERROR, user_data);
+					break;
+			}
+			break;
+		case SIM_AUTH_STATUS_RESP_INIT:
+			cb(SIM_AUTH_STATUS_INIT, user_data);
+			break;
 		default:
 			print_package("SIM Auth Response Package", msg, len);
+			cb(SIM_AUTH_STATUS_ERROR, user_data);
 			break;
 	}
 
-	isi_cb_data_free(cbd);
-	return FALSE;
-
-	error:
-		isi_cb_data_free(cbd);
-		return TRUE;
+	return TRUE;
 }
 
 void isi_sim_auth_request_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data) {
@@ -277,7 +294,6 @@ void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, 
 			print_package("SIM Auth Indication Package", msg, len);
 			break;
 	}
-
 }
 
 void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data) {
