@@ -325,7 +325,10 @@ namespace ISI {
 			VALID_PUK,
 			INVALID_PIN,
 			INVALID_PUK,
-			AUTHORIZED
+			AUTHORIZED,
+			INIT,
+			PROTECTED,
+			UNPROTECTED
 		}
 
 		/**
