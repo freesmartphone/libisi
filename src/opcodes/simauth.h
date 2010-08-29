@@ -69,8 +69,9 @@ enum sim_auth_status_resp {
 };
 
 enum sim_auth_status_resp_running {
-	SIM_AUTH_STATUS_RESP_RUNNING_AUTHORIZED = 0x12,
-	SIM_AUTH_STATUS_RESP_RUNNING_NO_SIM     = 0x16
+	SIM_AUTH_STATUS_RESP_RUNNING_AUTHORIZED  = 0x12,
+	SIM_AUTH_STATUS_RESP_RUNNING_UNPROTECTED = 0x13,
+	SIM_AUTH_STATUS_RESP_RUNNING_NO_SIM      = 0x16
 };
 
 #ifdef __cplusplus

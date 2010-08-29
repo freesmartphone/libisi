@@ -192,6 +192,9 @@ static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *rest
 				case SIM_AUTH_STATUS_RESP_RUNNING_AUTHORIZED:
 					cb(SIM_AUTH_STATUS_AUTHORIZED, user_data);
 					break;
+				case SIM_AUTH_STATUS_RESP_RUNNING_UNPROTECTED:
+					cb(SIM_AUTH_STATUS_UNPROTECTED, user_data);
+					break;
 				case SIM_AUTH_STATUS_RESP_RUNNING_NO_SIM:
 					cb(SIM_AUTH_STATUS_NO_SIM, user_data);
 					break;
