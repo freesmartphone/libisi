@@ -421,4 +421,9 @@ namespace ISI {
 	 * The SMS subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class SMS { }
+
+	/**
+	 * The GPS subsystem of the GSM modem (''not yet implemented'')
+	 */
+	public class GPS { }
 }
