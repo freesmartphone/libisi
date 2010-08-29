@@ -69,8 +69,8 @@ local phone_info_sub_ids = {
 }
 
 local sim_auth_msg_ids = {
-	[0x01] = "SIM_AUTH_REQUIRED_REQ",
-	[0x02] = "SIM_AUTH_REQUIRED_RESP",
+	[0x01] = "SIM_AUTH_PROTECTED_REQ",
+	[0x02] = "SIM_AUTH_PROTECTED_RESP",
 	[0x04] = "SIM_AUTH_UPDATE_REQ",
 	[0x05] = "SIM_AUTH_UPDATE_SUCCESS_RESP",
 	[0x06] = "SIM_AUTH_UPDATE_FAIL_RESP",
@@ -110,9 +110,9 @@ local sim_auth_resp = {
 }
 
 local sim_auth_pin_req = {
-	[0x00] = "SIM_AUTH_PIN_REQUIRED_DISABLE",
-	[0x01] = "SIM_AUTH_PIN_REQUIRED_ENABLE",
-	[0x04] = "SIM_AUTH_PIN_REQUIRED_STATUS"
+	[0x00] = "SIM_AUTH_PIN_PROTECTED_DISABLE",
+	[0x01] = "SIM_AUTH_PIN_PROTECTED_ENABLE",
+	[0x04] = "SIM_AUTH_PIN_PROTECTED_STATUS"
 }
 
 fields.rdev = ProtoField.uint8("phonet.receiver", "Receiver Device ID", base.HEX, device)

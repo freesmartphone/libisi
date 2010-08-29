@@ -369,8 +369,26 @@ namespace ISI {
 		 * @param cb The callback with the status feedback
 		 * @param data user data for the callback
 		 */
-		[CCode (cname = "isi_sim_auth_set_puk")]
+		[CCode (cname = "isi_sim_auth_update_pin")]
 		public void update_pin(string old_pin, string new_pin, auth_cb cb, void *data);
+
+		/**
+		 * Get PIN Protection Status
+		 * @param cb The callback with the status feedback
+		 * @param data user data for the callback
+		 */
+		[CCode (cname = "isi_sim_auth_get_pin_protection")]
+		public void get_pin_protection(auth_status_cb cb, void *data);
+
+		/**
+		 * Set PIN Protection Status
+		 * @param pin The pin to access this feature
+		 * @param status true=enable the protection, false=disable it
+		 * @param cb The callback with the status feedback
+		 * @param data user data for the callback
+		 */
+		[CCode (cname = "isi_sim_auth_set_pin_protection")]
+		public void set_pin_protection(string pin, bool status, auth_status_cb cb, void *data);
 
 		/**
 		 * Request SIM Auth status

@@ -251,7 +251,6 @@ static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *rest
 	void *user_data = cbd->data;
 	isi_cb_data_free(cbd);
 
-
 	if(!cb) {
 		g_warning("isi_sim_auth_status_resp_cb: no callback defined");
 		return TRUE;
@@ -310,6 +309,93 @@ void isi_sim_auth_request_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb
 		goto error;
 
 	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_AUTH_TIMEOUT, isi_sim_auth_status_resp_cb, cbd))
+		return;
+
+error:
+	cb(SIM_AUTH_STATUS_ERROR, user_data);
+	isi_cb_data_free(cbd);
+}
+
+static gboolean isi_sim_auth_protection_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
+	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = opaque;
+	isi_sim_auth_status_cb cb = cbd->callback;
+	void *user_data = cbd->data;
+	isi_cb_data_free(cbd);
+
+	if(!cb) {
+		g_warning("isi_sim_auth_status_resp_cb: no callback defined");
+		return TRUE;
+	}
+
+	if (!msg) {
+		g_warning("ISI client error: %d", g_isi_client_error(client));
+		cb(SIM_AUTH_STATUS_ERROR, user_data);
+		return TRUE;
+	}
+
+	if(msg[0] != SIM_AUTH_PROTECTED_RESP) {
+		print_package("SIM Auth Protected Response Package", msg, len);
+		cb(SIM_AUTH_STATUS_ERROR, user_data);
+		return TRUE;
+	}
+
+	switch(msg[1]) {
+		case SIM_AUTH_PIN_PROTECTED_DISABLE:
+			cb(SIM_AUTH_STATUS_UNPROTECTED, user_data);
+			break;
+		case SIM_AUTH_PIN_PROTECTED_ENABLE:
+			cb(SIM_AUTH_STATUS_PROTECTED, user_data);
+			break;
+		default:
+			print_package("SIM Auth Protected Response Package", msg, len);
+			cb(SIM_AUTH_STATUS_ERROR, user_data);
+			break;
+	}
+
+	return TRUE;
+}
+
+void isi_sim_auth_get_pin_protection(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+
+	unsigned char msg[] = {
+		SIM_AUTH_PROTECTED_REQ, SIM_AUTH_REQ_PIN, SIM_AUTH_PIN_PROTECTED_STATUS
+	};
+
+	if(!cbd)
+		goto error;
+
+	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_AUTH_TIMEOUT, isi_sim_auth_protection_cb, cbd))
+		return;
+
+error:
+	cb(SIM_AUTH_STATUS_ERROR, user_data);
+	isi_cb_data_free(cbd);
+}
+
+void isi_sim_auth_set_pin_protection(struct isi_sim_auth *nd, char *pin, gboolean status, isi_sim_auth_status_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+	int len = strlen(pin);
+	unsigned char *msg = malloc(len+4);
+
+	if(len > SIM_MAX_PIN_LENGTH)
+		goto error;
+
+	if(!cbd)
+		goto error;
+
+	if(!msg)
+		goto error;
+
+	msg[0] = SIM_AUTH_PROTECTED_REQ;
+	msg[1] = SIM_AUTH_REQ_PIN;
+	msg[2] = status ? SIM_AUTH_PIN_PROTECTED_ENABLE : SIM_AUTH_PIN_PROTECTED_DISABLE;
+
+	/* insert the PIN including the \00 */
+	memcpy(msg+3, pin, len+1);
+
+	if(g_isi_request_make(nd->client, msg, len+4, SIM_AUTH_TIMEOUT, isi_sim_auth_protection_cb, cbd))
 		return;
 
 error:
