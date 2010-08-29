@@ -77,6 +77,20 @@ local sim_auth_msg_ids = {
 	[0x12] = "SIM_AUTH_STATUS_RESP"
 }
 
+local sim_auth_ind_ids = {
+	[0x01] = "SIM_AUTH_NEED_AUTH",
+	[0x02] = "SIM_AUTH_NEED_NO_AUTH",
+	[0x03] = "SIM_AUTH_VALID",
+	[0x04] = "SIM_AUTH_INVALID",
+	[0x05] = "SIM_AUTH_AUTHORIZED"
+}
+
+local sim_auth_ind_type = {
+	[0x02] = "SIM_AUTH_PIN",
+	[0x03] = "SIM_AUTH_PUK",
+	[0x63] = "SIM_AUTH_OK"
+}
+
 local sim_auth_req = {
 	[0x02] = "SIM_AUTH_REQ_PIN",
 	[0x03] = "SIM_AUTH_REQ_PUK"
@@ -97,6 +111,9 @@ isifields.SIM_AUTH = ProtoField.uint8("isi.cmd", "Command", base.HEX, sim_auth_m
 isifields.COMMON       = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, common_msg_sub_ids)
 isifields.INFO_REQ     = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, phone_info_sub_ids)
 isifields.SIM_AUTH_REQ = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, sim_auth_req)
+isifields.SIM_AUTH_IND = ProtoField.uint8("isi.subcmd", "Subinstruction", base.HEX, sim_auth_ind_ids)
+
+isifields.SIM_AUTH_IND_TYPE = ProtoField.uint8("isi.sim.auth_type", "Authentication Type", base.HEX, sim_auth_ind_type)
 
 isifields.PIN = ProtoField.string("isi.sim.pin", "PIN")
 isifields.PUK = ProtoField.string("isi.sim.puk", "PUK")
@@ -150,6 +167,13 @@ function analyze_sim_auth(buffer, subtree)
 				dataLength = dataLength - 11
 			end
 		end
+	end
+
+	if msgid == 0x10 then
+		subtree:add(isifields.SIM_AUTH_IND, buffer(offset, 1))
+		skip()
+		subtree:add(isifields.SIM_AUTH_IND_TYPE, buffer(offset, 1))
+		skip()
 	end
 
 	if msgid == 0x11 then
