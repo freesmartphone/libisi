@@ -91,6 +91,11 @@ local sim_auth_ind_ids = {
 	[0x06] = "SIM_AUTH_IND_CONFIG"
 }
 
+local sim_auth_ind_cfg = {
+	[0x0B] = "SIM_AUTH_PIN_PROTECTED_DISABLE",
+	[0x0C] = "SIM_AUTH_PIN_PROTECTED_ENABLE"
+}
+
 local sim_auth_ind_type = {
 	[0x02] = "SIM_AUTH_PIN",
 	[0x03] = "SIM_AUTH_PUK",
@@ -141,6 +146,7 @@ isifields.OLD_PIN          = ProtoField.string("isi.sim.old_pin", "Old PIN")
 isifields.NEW_PIN          = ProtoField.string("isi.sim.new_pin", "New PIN")
 isifields.PIN              = ProtoField.string("isi.sim.pin", "PIN")
 isifields.PUK              = ProtoField.string("isi.sim.puk", "PUK")
+isifields.SIM_AUTH_IND_CFG = ProtoField.uint8("isi.sim.cfg", "Configuration", base.HEX, sim_auth_ind_cfg)
 
 isifields.data = ProtoField.bytes("isi.data", "Remaining Data")
 
@@ -228,10 +234,15 @@ function analyze_sim_auth(buffer, subtree)
 	end
 
 	if msgid == 0x10 then
+		local subcmd = buffer(offset, 1):uint()
 		subtree:add(isifields.SIM_AUTH_IND, buffer(offset, 1))
 		skip()
 		subtree:add(isifields.SIM_AUTH_PW_TYPE, buffer(offset, 1))
 		skip()
+		if subcmd == 0x06 then
+			subtree:add(isifields.SIM_AUTH_IND_CFG, buffer(offset, 1))
+			skip()
+		end
 	end
 
 	if msgid == 0x11 then
