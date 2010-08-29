@@ -339,6 +339,19 @@ namespace ISI {
 		 */
 		[CCode (cname = "isi_sim_auth_set_puk")]
 		public void set_puk(string puk, string pin, auth_cb cb, void *data);
+
+		/**
+		 * Subscribe to status changing notifications
+		 * Overwrites previous set callback
+		 */
+		[CCode (cname = "isi_sim_auth_subscribe_status")]
+		public void subscribe_status(auth_cb cb, void *data);
+
+		/**
+		 * Unsubscribe from status changing notifications
+		 */
+		[CCode (cname = "isi_sim_auth_unsubscribe_status")]
+		public void unsubscribe_status();
 	}
 
 	/**
