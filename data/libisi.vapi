@@ -360,6 +360,16 @@ namespace ISI {
 		public void set_puk(string puk, string pin, auth_cb cb, void *data);
 
 		/**
+		 * Change the PIN code
+		 * @param old_pin The old PIN code
+		 * @param new_pin The new PIN code
+		 * @param cb The callback with the status feedback
+		 * @param data user data for the callback
+		 */
+		[CCode (cname = "isi_sim_auth_set_puk")]
+		public void update_pin(string old_pin, string new_pin, auth_cb cb, void *data);
+
+		/**
 		 * Request SIM Auth status
 		 * @param cb The callback with the status feedback
 		 * @param data user data for the callback

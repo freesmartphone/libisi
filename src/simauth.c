@@ -100,7 +100,7 @@ void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb
 
 	if(len > SIM_MAX_PIN_LENGTH) {
 		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
-		g_free(cbd);
+		isi_cb_data_free(cbd);
 		return;
 	}
 
@@ -115,7 +115,7 @@ void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb
 
 error:
 	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
-	g_free(cbd);
+	isi_cb_data_free(cbd);
 }
 
 void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim_auth_cb cb, void *user_data) {
@@ -133,13 +133,13 @@ void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim
 
 	if(pinlen > SIM_MAX_PIN_LENGTH) {
 		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
-		g_free(cbd);
+		isi_cb_data_free(cbd);
 		return;
 	}
 
 	if(puklen > SIM_MAX_PUK_LENGTH) {
 		cb(SIM_AUTH_ERR_PUK_TOO_LONG, user_data);
-		g_free(cbd);
+		isi_cb_data_free(cbd);
 		return;
 	}
 
@@ -157,8 +157,94 @@ void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim
 
 error:
 	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
-	g_free(cbd);
+	isi_cb_data_free(cbd);
 }
+
+
+
+static gboolean isi_sim_auth_update_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = user_data;
+	isi_sim_auth_cb cb = cbd->callback;
+	isi_cb_data_free(cbd);
+
+
+	if (!msg) {
+		g_debug("ISI client error: %d", g_isi_client_error(client));
+		return TRUE;
+	}
+
+	switch(msg[0]) {
+		case SIM_AUTH_UPDATE_SUCCESS_RESP:
+			cb(SIM_AUTH_OK, user_data);
+			break;
+		case SIM_AUTH_UPDATE_FAIL_RESP:
+			switch(msg[1]) {
+				case SIM_AUTH_ERROR_INVALID_PW:
+					cb(SIM_AUTH_ERR_INVALID, user_data);
+					break;
+				case SIM_AUTH_ERROR_NEED_PUK:
+					cb(SIM_AUTH_ERR_NEED_PUK, user_data);
+					break;
+				default:
+					g_warning("unknown sim auth update response");
+					print_package("SIM_PIN_UPDATE", msg, len);
+					cb(SIM_AUTH_ERR_UNKNOWN, user_data);
+					break;
+			}
+			break;
+		default:
+			g_warning("unknown sim auth update response");
+			print_package("SIM_PIN_UPDATE", msg, len);
+			cb(SIM_AUTH_ERR_UNKNOWN, user_data);
+			break;
+	}
+}
+
+void isi_sim_update_pin(struct isi_sim_auth *nd, char *old_pin, char *new_pin, isi_sim_auth_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+	int old_len = strlen(old_pin);
+	int new_len = strlen(new_pin);
+	int i;
+
+	unsigned char msg[] = {
+		SIM_AUTH_UPDATE_REQ, SIM_AUTH_REQ_PIN,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+	if(old_len > SIM_MAX_PIN_LENGTH) {
+		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
+		isi_cb_data_free(cbd);
+		return;
+	}
+
+	if(new_len > SIM_MAX_PIN_LENGTH) {
+		cb(SIM_AUTH_ERR_PIN_TOO_LONG, user_data);
+		isi_cb_data_free(cbd);
+		return;
+	}
+
+	/* insert the PUK into the request */
+	memcpy(msg+2, old_pin, old_len);
+
+	/* insert the PIN into the request */
+	memcpy(msg+13, new_pin, new_len);
+
+	if(!cbd)
+		goto error;
+
+	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_AUTH_TIMEOUT, isi_sim_auth_update_resp_cb, cbd))
+		return;
+
+error:
+	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
+	isi_cb_data_free(cbd);
+}
+
 
 static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
@@ -231,9 +317,8 @@ void isi_sim_auth_request_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb
 
 error:
 	cb(SIM_AUTH_STATUS_ERROR, user_data);
-	g_free(cbd);
+	isi_cb_data_free(cbd);
 }
-
 
 void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;

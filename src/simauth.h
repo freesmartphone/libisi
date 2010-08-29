@@ -23,7 +23,9 @@ enum isi_sim_auth_status {
 	SIM_AUTH_STATUS_INVALID_PUK,
 	SIM_AUTH_STATUS_AUTHORIZED,
 	SIM_AUTH_STATUS_UNPROTECTED,
-	SIM_AUTH_STATUS_INIT
+	SIM_AUTH_STATUS_INIT,
+	SIM_AUTH_STATUS_PROTECTED,
+	SIM_AUTH_STATUS_UNPROTECTED
 };
 
 enum isi_sim_auth_answer {
@@ -46,8 +48,14 @@ typedef void (*isi_sim_auth_status_cb)(enum isi_sim_auth_status code, void *user
 /* methods */
 void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb, void *user_data);
 void isi_sim_auth_set_puk(struct isi_sim_auth *nd, char *puk, char *pin, isi_sim_auth_cb cb, void *user_data);
+void isi_sim_update_pin(struct isi_sim_auth *nd, char *old_pin, char *new_pin, isi_sim_auth_cb cb, void *user_data);
+
+void isi_sim_auth_get_pin_requirement(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data);
+void isi_sim_auth_set_pin_requirement(struct isi_sim_auth *nd, char *pin, gboolean status, isi_sim_auth_status_cb cb, void *user_data);
+
 void isi_sim_auth_request_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data);
 void isi_sim_auth_subscribe_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data);
 void isi_sim_auth_unsubscribe_status(struct isi_sim_auth *nd);
+
 
 #endif

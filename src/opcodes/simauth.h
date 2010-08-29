@@ -29,12 +29,17 @@ extern "C" {
 #define SIM_MAX_PUK_LENGTH	8
 
 enum sim_auth_message_id {
-	SIM_AUTH_REQ = 0x07,
-	SIM_AUTH_SUCCESS_RESP = 0x08,
-	SIM_AUTH_FAIL_RESP = 0x09,
-	SIM_AUTH_STATUS_IND = 0x10,
-	SIM_AUTH_STATUS_REQ = 0x11,
-	SIM_AUTH_STATUS_RESP = 0x12
+	SIM_AUTH_REQUIRED_REQ        = 0x01,
+	SIM_AUTH_REQUIRED_RESP       = 0x02,
+	SIM_AUTH_UPDATE_REQ          = 0x04,
+	SIM_AUTH_UPDATE_SUCCESS_RESP = 0x05,
+	SIM_AUTH_UPDATE_FAIL_RESP    = 0x06,
+	SIM_AUTH_REQ                 = 0x07,
+	SIM_AUTH_SUCCESS_RESP        = 0x08,
+	SIM_AUTH_FAIL_RESP           = 0x09,
+	SIM_AUTH_STATUS_IND          = 0x10,
+	SIM_AUTH_STATUS_REQ          = 0x11,
+	SIM_AUTH_STATUS_RESP         = 0x12
 };
 
 enum sim_auth_req_sub_id {
@@ -52,7 +57,8 @@ enum sim_auth_ind_id {
 	SIM_AUTH_IND_NEED_NO_AUTH = 0x02,
 	SIM_AUTH_IND_VALID        = 0x03,
 	SIM_AUTH_IND_INVALID      = 0x04,
-	SIM_AUTH_IND_AUTHORIZED   = 0x05
+	SIM_AUTH_IND_AUTHORIZED   = 0x05,
+	SIM_AUTH_IND_CONFIG       = 0x06
 };
 
 enum sim_auth_ind_type {
