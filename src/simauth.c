@@ -160,8 +160,6 @@ error:
 	isi_cb_data_free(cbd);
 }
 
-
-
 static gboolean isi_sim_auth_update_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
 	const unsigned char *msg = data;
 	struct isi_cb_data *cbd = user_data;
@@ -244,7 +242,6 @@ error:
 	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
 	isi_cb_data_free(cbd);
 }
-
 
 static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
@@ -329,6 +326,23 @@ void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, 
 
 	if(!msg || len < 3 || msg[0] != SIM_AUTH_STATUS_IND) {
 		cb(SIM_AUTH_STATUS_ERROR, user_data);
+		return;
+	}
+
+	if(msg[3] != SIM_AUTH_IND_OK) {
+		switch(msg[3]) {
+			case SIM_AUTH_IND_CFG_UNPROTECTED:
+				cb(SIM_AUTH_STATUS_UNPROTECTED, user_data);
+				break;
+			case SIM_AUTH_IND_CFG_PROTECTED:
+				cb(SIM_AUTH_STATUS_PROTECTED, user_data);
+				break;
+			default:
+				print_package("SIM Auth Indication Package", msg, len);
+				cb(SIM_AUTH_STATUS_ERROR, user_data);
+				break;
+		}
+
 		return;
 	}
 
