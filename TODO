@@ -4,11 +4,6 @@
 [network]
 * signal RAT
 
-[simauth]
-* get status
-* subscribe status
-* unsubscribe status
-
 [sim]
 * imsi
 * issuer
