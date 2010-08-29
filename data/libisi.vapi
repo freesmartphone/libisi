@@ -343,7 +343,7 @@ namespace ISI {
 		/**
 		 * Set PIN code
 		 * @param pin The PIN code
-		 * @param auth_cb The callback with the status feedback
+		 * @param cb The callback with the status feedback
 		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_pin")]
@@ -353,11 +353,19 @@ namespace ISI {
 		 * Set PUK code
 		 * @param puk The PUK code
 		 * @param pin The new PIN code
-		 * @param auth_cb The callback with the status feedback
+		 * @param cb The callback with the status feedback
 		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_puk")]
 		public void set_puk(string puk, string pin, auth_cb cb, void *data);
+
+		/**
+		 * Request SIM Auth status
+		 * @param cb The callback with the status feedback
+		 * @param data user data for the callback
+		 */
+		[CCode (cname = "isi_sim_auth_request_status")]
+		public void request_status(status_cb cb, void *data);
 
 		/**
 		 * Subscribe to status changing notifications

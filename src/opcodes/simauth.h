@@ -61,6 +61,12 @@ enum sim_auth_ind_type {
 	SIM_AUTH_IND_OK  = 0x63
 };
 
+enum sim_auth_status_resp {
+	SIM_AUTH_STATUS_RESP_NEED_PIN = 0x02,
+	SIM_AUTH_STATUS_RESP_NEED_PUK = 0x03,
+	SIM_AUTH_STATUS_RESP_INIT     = 0x07
+};
+
 #ifdef __cplusplus
 };
 #endif

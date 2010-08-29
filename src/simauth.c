@@ -24,58 +24,6 @@
 #include "gisi/iter.h"
 #include "helper.h"
 
-#if 0
-
-	TODO: I guess this is a status request
-	TODO: we also need status indication, see network.c to get info how they look like
-
-	/* TODO: sscd uses this magic byte, there is no documentation for it, seems to be some status request */
-	unsigned char msg[] = {
-		0x11, 0x00, 0x00
-	};
-
-	g_debug("Send PN_SIM_AUTH magic packet");
-	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_TIMEOUT, sim_auth_reachable_cb, cbd))
-		return nd;
-
-static gboolean sim_auth_reachable_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
-	const unsigned char *msg = data;
-	struct isi_cb_data *cbd = user_data;
-	isi_subsystem_reachable_cb cb = cbd->callback;
-
-	g_debug("%s reachable", pn_resource_name(g_isi_client_resource(client)));
-
-	if (!msg) {
-		g_debug("ISI client error: %d", g_isi_client_error(client));
-		if(cb) cb(TRUE, cbd->data);
-		isi_cb_data_free(cbd);
-		return TRUE;
-	}
-
-	unsigned char answer1[] = {
-		0x12, 0x02, 0x63, 0x00, 0x00, 0x00, 0x00
-	};
-
-	unsigned char answer2[] = {
-		0x12, 0x03, 0x63, 0x00, 0x00, 0x00, 0x00
-	};
-
-	print_package("SIMAUTH", msg, len);
-
-	if(cb) {
-		if(memcmp(msg, answer1, sizeof(answer1)) == 0)
-			cb(FALSE, cbd->data);
-		else if(memcmp(msg, answer2, sizeof(answer2)) == 0)
-			cb(FALSE, cbd->data);
-		else
-			cb(TRUE, cbd->data);
-	}
-
-	//isi_cb_data_free(cbd);
-}
-#endif
-
-
 struct isi_sim_auth* isi_sim_auth_create(struct isi_modem *modem) {
 	struct isi_sim_auth *nd = calloc(sizeof(struct isi_sim_auth), 1);
 
@@ -211,6 +159,61 @@ error:
 	cb(SIM_AUTH_ERR_UNKNOWN, user_data);
 	g_free(cbd);
 }
+
+static gboolean isi_sim_auth_status_resp_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *user_data) {
+	const unsigned char *msg = data;
+	struct isi_cb_data *cbd = user_data;
+	isi_sim_auth_status_cb cb = cbd->callback;
+
+	if(!cb) {
+		g_warning("isi_sim_auth_status_resp_cb: no callback defined");
+		goto error;
+	}
+
+	if (!msg) {
+		g_warning("ISI client error: %d", g_isi_client_error(client));
+		cb(SIM_AUTH_STATUS_ERROR, cbd->data);
+		goto error;
+	}
+
+	switch(msg[1]) {
+		case SIM_AUTH_STATUS_RESP_NEED_PIN:
+			cb(SIM_AUTH_STATUS_NEED_PIN, user_data);
+			break;
+		case SIM_AUTH_STATUS_RESP_NEED_PUK:
+			cb(SIM_AUTH_STATUS_NEED_PUK, user_data);
+			break;
+		default:
+			print_package("SIM Auth Response Package", msg, len);
+			break;
+	}
+
+	isi_cb_data_free(cbd);
+	return FALSE;
+
+	error:
+		isi_cb_data_free(cbd);
+		return TRUE;
+}
+
+void isi_sim_auth_request_status(struct isi_sim_auth *nd, isi_sim_auth_status_cb cb, void *user_data) {
+	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
+
+	unsigned char msg[] = {
+		SIM_AUTH_STATUS_REQ, 0x00, 0x00
+	};
+
+	if(!cbd)
+		goto error;
+
+	if(g_isi_request_make(nd->client, msg, sizeof(msg), SIM_AUTH_TIMEOUT, isi_sim_auth_status_resp_cb, cbd))
+		return;
+
+error:
+	cb(SIM_AUTH_STATUS_ERROR, user_data);
+	g_free(cbd);
+}
+
 
 void sim_auth_ind_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
 	const unsigned char *msg = data;
