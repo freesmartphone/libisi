@@ -413,6 +413,11 @@ namespace ISI {
 	}
 
 	/**
+	 * The PDP subsystem of the GSM modem (''not yet implemented'')
+	 */
+	public class GPDS { }
+
+	/**
 	 * The Call subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class Call { }
