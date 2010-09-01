@@ -17,7 +17,6 @@
 using ISI;
 
 Modem m;
-SIMAuth s;
 Network n;
 
 void operator_list_callback(bool error, Network.operator[] operators, void *user_data) {
@@ -64,25 +63,15 @@ void network_reachable(bool error, void *data) {
 	if(!error) {
 		/* the following commands are all working, but will spam your terminal */
 
-		//n.subscribe_status(status_callback, data);
-		//n.subscribe_strength(strength_callback, data);
-		//n.list_operators(operator_list_callback, data);
-		//n.register_auto(register_callback, data);
-		//n.request_status(status_callback, data);
-		//n.request_strength(strength_callback, data);
-		//n.current_operator(operator_callback, data);
+		n.subscribe_status(status_callback, data);
+		n.subscribe_strength(strength_callback, data);
+		n.list_operators(operator_list_callback, data);
+		n.register_auto(register_callback, data);
+		n.request_status(status_callback, data);
+		n.request_strength(strength_callback, data);
+		n.current_operator(operator_callback, data);
 	} else {
 		warning("Could not create network object");
-	}
-}
-
-void pin_callback(SIMAuth.answer msg, void *data) {
-	if(msg == 0) {
-		message("Valid PIN, trying to register to Network");
-		n = new Network(m, network_reachable, data);
-	} else {
-		message("Invalid PIN");
-		message("Code: %d", msg);
 	}
 }
 
@@ -91,8 +80,7 @@ void modem_reachable(bool error, void *data) {
 
 	if(!error) {
 		m.enable();
-		s = new SIMAuth(m);
-		s.set_pin("5336", pin_callback, null);
+		n = new Network(m, network_reachable, data);
 	}
 }
 

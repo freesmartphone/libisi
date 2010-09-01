@@ -1,7 +1,12 @@
-test: test.vala
-	valac --vapidir=../data --pkg libisi -g test.vala
+build: authenticate network
+
+network: network.vala
+	valac --vapidir=../data --pkg libisi -g network.vala
+
+authenticate: authenticate.vala
+	valac --vapidir=../data --pkg libisi -g authenticate.vala
 
 clean:
-	rm -rf test
+	rm -rf network authenticate
 
-.PHONY: test clean
+.PHONY: build clean

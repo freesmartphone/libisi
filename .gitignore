@@ -2,4 +2,5 @@
 *.o
 src/glib-enum-binding.h
 html/
-test/test
+test/network
+test/authenticate
