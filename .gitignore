@@ -1,4 +1,5 @@
 *.so.*
 *.o
+src/glib-enum-binding.h
 html/
 test/test

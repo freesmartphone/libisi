@@ -9,18 +9,27 @@ HEADERS:=modem.h network.h device_info.h sim.h simauth.h
 
 include ../config.mk
 
-all: $(LONGNAME)
+all: $(LONGNAME) glib-enum-binding.h
 
 %.o: %.c
 	@echo "[CC] $<"
 	@$(CC) $(CFLAGS) -I. -Igisi -I isi -g -c -std=c99 -fPIC -o $@ $<
+
+glib-enum-binding.h: $(HEADERS)
+	@echo "Generating glib-enum-binding.h"
+	@glib-mkenums \
+		--fprod "\n/* enumerations from \"@filename@\" */" \
+		--vhead "GType\n@enum_name@_get_type (void)\n{\n  static GType etype = 0;\n  if (etype == 0) {\n    static const G@Type@Value values[] = {" \
+		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
+		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n#define @ENUMNAME@_TYPE (@enum_name@_get_type())\n\n" \
+		$^ > glib-enum-binding.h
 
 $(LONGNAME): $(OBJECTS)
 	@echo "[LD] $@"
 	@$(CC) -shared -Wl,-soname,$(NAME) -o $@ $(LIBS) -g $^
 
 clean:
-	rm -f test gisi/*.o *.o $(LONGNAME)
+	rm -f test gisi/*.o *.o glib-enum-binding.h $(LONGNAME)
 
 install: all
 	@echo Installing shared object...
@@ -29,7 +38,7 @@ install: all
 	@ln -sf $(NAME) $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
 	@echo Installing header files...
 	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi
-	@$(INSTALL_DATA) $(HEADERS) opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
+	@$(INSTALL_DATA) $(HEADERS) glib-enum-binding.h opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
 
 uninstall:
 	@echo Removing shared object...

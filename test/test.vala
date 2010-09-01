@@ -76,7 +76,7 @@ void network_reachable(bool error, void *data) {
 	}
 }
 
-void pin_callback(SIMAuth.auth_answer msg, void *data) {
+void pin_callback(SIMAuth.answer msg, void *data) {
 	if(msg == 0) {
 		message("Valid PIN, trying to register to Network");
 		n = new Network(m, network_reachable, data);

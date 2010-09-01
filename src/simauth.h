@@ -11,38 +11,38 @@ struct isi_sim_auth {
 	GIsiClient *client;
 };
 
-enum isi_sim_auth_status {
-	SIM_AUTH_STATUS_ERROR,
-	SIM_AUTH_STATUS_NO_SIM,
-	SIM_AUTH_STATUS_NEED_NONE,
-	SIM_AUTH_STATUS_NEED_PIN,
-	SIM_AUTH_STATUS_NEED_PUK,
-	SIM_AUTH_STATUS_VALID_PIN,
-	SIM_AUTH_STATUS_VALID_PUK,
-	SIM_AUTH_STATUS_INVALID_PIN,
-	SIM_AUTH_STATUS_INVALID_PUK,
-	SIM_AUTH_STATUS_AUTHORIZED,
-	SIM_AUTH_STATUS_INIT,
-	SIM_AUTH_STATUS_PROTECTED,
-	SIM_AUTH_STATUS_UNPROTECTED
-};
+typedef enum {
+	ISI_SIM_AUTH_STATUS_ERROR,
+	ISI_SIM_AUTH_STATUS_NO_SIM,
+	ISI_SIM_AUTH_STATUS_NEED_NONE,
+	ISI_SIM_AUTH_STATUS_NEED_PIN,
+	ISI_SIM_AUTH_STATUS_NEED_PUK,
+	ISI_SIM_AUTH_STATUS_VALID_PIN,
+	ISI_SIM_AUTH_STATUS_VALID_PUK,
+	ISI_SIM_AUTH_STATUS_INVALID_PIN,
+	ISI_SIM_AUTH_STATUS_INVALID_PUK,
+	ISI_SIM_AUTH_STATUS_AUTHORIZED,
+	ISI_SIM_AUTH_STATUS_INITIALIZING,
+	ISI_SIM_AUTH_STATUS_PROTECTED,
+	ISI_SIM_AUTH_STATUS_UNPROTECTED
+} IsiSimAuthStatus;
 
-enum isi_sim_auth_answer {
-	SIM_AUTH_OK,
-	SIM_AUTH_ERR_UNKNOWN,
-	SIM_AUTH_ERR_PIN_TOO_LONG,
-	SIM_AUTH_ERR_PUK_TOO_LONG,
-	SIM_AUTH_ERR_INVALID,
-	SIM_AUTH_ERR_NEED_PUK
-};
+typedef enum {
+	ISI_SIM_AUTH_ANSWER_OK,
+	ISI_SIM_AUTH_ANSWER_ERR_UNKNOWN,
+	ISI_SIM_AUTH_ANSWER_ERR_PIN_TOO_LONG,
+	ISI_SIM_AUTH_ANSWER_ERR_PUK_TOO_LONG,
+	ISI_SIM_AUTH_ANSWER_ERR_INVALID,
+	ISI_SIM_AUTH_ANSWER_ERR_NEED_PUK
+} IsiSimAuthAnswer;
 
 /* creation & destruction */
 struct isi_sim_auth* isi_sim_auth_create(struct isi_modem *modem);
 void isi_sim_auth_destroy(struct isi_sim_auth *nd);
 
 /* callbacks */
-typedef void (*isi_sim_auth_cb)(enum isi_sim_auth_answer code, void *user_data);
-typedef void (*isi_sim_auth_status_cb)(enum isi_sim_auth_status code, void *user_data);
+typedef void (*isi_sim_auth_cb)(IsiSimAuthAnswer code, void *user_data);
+typedef void (*isi_sim_auth_status_cb)(IsiSimAuthStatus code, void *user_data);
 
 /* methods */
 void isi_sim_auth_set_pin(struct isi_sim_auth *nd, char *pin, isi_sim_auth_cb cb, void *user_data);

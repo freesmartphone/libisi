@@ -304,8 +304,8 @@ namespace ISI {
 	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "isi/simauth.h")]
 	[Compact]
 	public class SIMAuth {
-		[CCode (cname = "enum isi_sim_auth_answer", cprefix="SIM_AUTH_")]
-		public enum auth_answer {
+		[CCode (cname = "IsiSimAuthAnswer", cheader_filename="isi/glib-enum-binding.h", has_type_id="ISI_SIM_AUTH_ANSWER_TYPE")]
+		public enum answer {
 			OK,
 			ERR_UNKNOWN,
 			ERR_PIN_TOO_LONG,
@@ -314,8 +314,8 @@ namespace ISI {
 			ERR_NEED_PUK
 		}
 
-		[CCode (cname = "enum isi_sim_auth_status", cprefix="SIM_AUTH_STATUS_")]
-		public enum auth_status {
+		[CCode (cname = "IsiSimAuthStatus", cheader_filename="isi/glib-enum-binding.h", has_type_id="ISI_SIM_AUTH_STATUS_TYPE")]
+		public enum status {
 			ERROR,
 			NO_SIM,
 			NEED_NONE,
@@ -338,10 +338,10 @@ namespace ISI {
 		public SIMAuth(Modem *modem);
 
 		[CCode (cname = "isi_sim_auth_cb", has_target = false)]
-		public delegate void auth_cb(auth_answer code, void *user_data);
+		public delegate void auth_cb(answer code, void *user_data);
 
 		[CCode (cname = "isi_sim_auth_status_cb", has_target = false)]
-		public delegate void auth_status_cb(auth_status code, void *user_data);
+		public delegate void auth_status_cb(status code, void *user_data);
 
 		/**
 		 * Set PIN code
