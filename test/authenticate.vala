@@ -21,7 +21,7 @@ SIMAuth s;
 
 void pin_callback(SIMAuth.answer msg, void *data) {
 	if(msg == SIMAuth.answer.OK) {
-		message("Valid PIN, trying to register to Network");
+		message("Valid PIN");
 	} else {
 		message("SIM Authentication Failed");
 		message("Message: %s", msg.to_string());
