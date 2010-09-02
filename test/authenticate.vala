@@ -18,29 +18,34 @@ using ISI;
 
 Modem m;
 SIMAuth s;
+MainLoop l;
 
 void pin_callback(SIMAuth.answer msg, void *data) {
 	if(msg == SIMAuth.answer.OK) {
 		message("Valid PIN");
+		l.quit();
 	} else {
 		message("SIM Authentication Failed");
 		message("Message: %s", msg.to_string());
+		l.quit();
 	}
 }
 
 void modem_reachable(bool error, void *data) {
-	stdout.printf("Modem Reachable Status: %s\n", error ? "down" : "up");
+	message("Modem Reachable Status: %s", error ? "down" : "up");
 
 	if(!error) {
 		m.enable();
 		s = new SIMAuth(m);
 		s.set_pin("5336", pin_callback, null);
+	} else {
+		l.quit();
 	}
 }
 
 void main(string[] argv) {
 	stdout.printf("N900 test utility\n");
 	m = new Modem("phonet0", modem_reachable, null);
-	var loop = new GLib.MainLoop();
-	loop.run();
+	l = new GLib.MainLoop();
+	l.run();
 }
