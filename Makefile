@@ -19,3 +19,6 @@ test: install
 doc:
 	rm -rf html
 	valadoc data/*.vapi -o html
+
+wireshark-plugin:
+	cd wireshark-plugin ; make all

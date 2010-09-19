@@ -1,0 +1,4 @@
+* port mtc analysis from the lua plugin
+* port phone info analysis from the lua plugin
+* write network analysis
+* try to do resource name translation via dissector
