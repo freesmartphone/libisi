@@ -1,3 +1,4 @@
+*.so
 *.so.*
 *.o
 src/glib-enum-binding.h
