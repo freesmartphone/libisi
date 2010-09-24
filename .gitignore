@@ -1,6 +1,7 @@
 *.so
 *.so.*
 *.o
+*.swp
 src/glib-enum-binding.h
 html/
 test/network
