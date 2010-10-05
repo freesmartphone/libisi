@@ -1,5 +1,5 @@
 CFLAGS+=-I/usr/include/wireshark -DHAVE_STDARG_H -DHAVE_CONFIG_H -g
-OBJECTS:=src/packet-isi.o src/plugin.o src/isi-simauth.o
+OBJECTS:=src/packet-isi.o src/plugin.o src/isi-simauth.o src/isi-gps.o
 
 PREFIX?=/usr
 PLUGINDIR?=lib/wireshark/libwireshark0/plugins

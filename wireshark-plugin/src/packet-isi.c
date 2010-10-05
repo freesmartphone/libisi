@@ -25,6 +25,7 @@
 
 #include "packet-isi.h"
 #include "isi-simauth.h"
+#include "isi-gps.h"
 
 #define ISI_LTYPE 0xF5
 
@@ -85,6 +86,7 @@ void proto_reg_handoff_isi(void) {
 
 		/* handoff resource dissectors */
 		proto_reg_handoff_isi_sim_auth();
+		proto_reg_handoff_isi_gps();
 	}
 }
 
@@ -135,6 +137,7 @@ void proto_register_isi(void) {
 
 	/* register resource dissectors */
 	proto_register_isi_sim_auth();
+	proto_register_isi_gps();
 }
 
 /* The dissector itself */
