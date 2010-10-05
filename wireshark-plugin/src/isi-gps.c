@@ -32,7 +32,7 @@
 static const value_string isi_gps_id[] = {
 	//{0x0d, "GPS_UNKNOWN_0D"},
 	//{0x0e, "GPS_UNKNOWN_0E"},
-	{0x7d, "GPS_STATUS"},
+	{0x7d, "GPS_STATUS_IND"},
 	//{0x7e, "GPS_UNKNOWN_7E"},
 	//{0x7f, "GPS_UNKNOWN_7F"},
 	//{0x82, "GPS_UNKNOWN_82"},
@@ -41,7 +41,9 @@ static const value_string isi_gps_id[] = {
 	//{0x85, "GPS_UNKNOWN_85"},
 	//{0x90, "GPS_UNKNOWN_90"},
 	//{0x91, "GPS_UNKNOWN_91"},
-	{0x92, "GPS_DATA"},
+	{0x90, "GPS_POWER_STATUS_REQ"},
+	{0x91, "GPS_POWER_STATUS_RSP"},
+	{0x92, "GPS_DATA_IND"},
 	{0x00, NULL }
 };
 
@@ -147,7 +149,23 @@ static void dissect_isi_gps(tvbuff_t *tvb, packet_info *pinfo, proto_item *isitr
 			case 0x7d: /* GPS Status */
 				proto_tree_add_item(tree, hf_isi_gps_status, tvb, 2, 1, FALSE);
 				guint8 status = tvb_get_guint8(tvb, 2);
-				col_add_fstr(pinfo->cinfo, COL_INFO, "GPS Status: %s", val_to_str(status, isi_gps_status, "unknown (0x%x)"));
+				col_add_fstr(pinfo->cinfo, COL_INFO, "GPS Status Indication: %s", val_to_str(status, isi_gps_status, "unknown (0x%x)"));
+				break;
+			case 0x84:
+			case 0x85:
+			case 0x86:
+			case 0x87:
+			case 0x88:
+			case 0x89:
+			case 0x8a:
+			case 0x8b:
+				col_add_fstr(pinfo->cinfo, COL_INFO, "unknown A-GPS package (0x%02x)", cmd);
+				break;
+			case 0x90: /* GPS Power Request */
+				col_set_str(pinfo->cinfo, COL_INFO, "GPS Power Request");
+				break;
+			case 0x91: /* GPS Power Request */
+				col_set_str(pinfo->cinfo, COL_INFO, "GPS Power Response");
 				break;
 			case 0x92: /* GPS Data */
 				col_set_str(pinfo->cinfo, COL_INFO, "GPS Data");
