@@ -1,0 +1,9 @@
+libisi is a library implementing the PhoNet (Phone Network Protocol),
+which has been invented by Nokia. PhoNet is available on Linux with
+the PhoNet socket family. The library is called libisi instead of
+libphonet, because phonet is just a specification for the abstract
+packages. ISI (Intelligent service interface) is the specific
+implementation used on the Nokia N900 (and some other phones).
+
+Apart from the library this repository contains a wireshark plugin,
+which decodes the ISI binary protocol.
