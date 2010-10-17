@@ -136,7 +136,7 @@ static void dissect_isi_sim_auth(tvbuff_t *tvb, packet_info *pinfo, proto_item *
 	guint8 cmd, code;
 
 	if(isitree) {
-		item = proto_tree_add_text(isitree, tvb, 0, -1, "Message");
+		item = proto_tree_add_text(isitree, tvb, 0, -1, "Payload");
 		tree = proto_item_add_subtree(item, ett_isi_msg);
 
 		proto_tree_add_item(tree, hf_isi_sim_auth_cmd, tvb, 0, 1, FALSE);
