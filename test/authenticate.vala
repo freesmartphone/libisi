@@ -15,6 +15,7 @@
  */
 
 using ISI;
+string pin;
 
 Modem m;
 SIMAuth s;
@@ -37,7 +38,7 @@ void modem_reachable(bool error, void *data) {
 	if(!error) {
 		m.enable();
 		s = new SIMAuth(m);
-		s.set_pin("5336", pin_callback, null);
+		s.set_pin(pin, pin_callback, null);
 	} else {
 		l.quit();
 	}
@@ -45,6 +46,12 @@ void modem_reachable(bool error, void *data) {
 
 void main(string[] argv) {
 	stdout.printf("N900 test utility\n");
+
+	if(argv.length < 2)
+		error("Usage: %s <pin>", argv[0]);
+	else
+		pin = argv[1];
+
 	m = new Modem("phonet0", modem_reachable, null);
 	l = new GLib.MainLoop();
 	l.run();
