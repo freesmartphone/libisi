@@ -29,7 +29,7 @@ $(LONGNAME): $(OBJECTS)
 	@$(CC) -shared -Wl,-soname,$(NAME) -o $@ $(LIBS) -g $^
 
 clean:
-	rm -f test gisi/*.o *.o glib-enum-binding.h headers $(LONGNAME)
+	rm -f test gisi/*.o *.o glib-enum-binding.h $(LONGNAME)
 
 install-headers: glib-enum-binding.h
 	@echo Installing header files...
