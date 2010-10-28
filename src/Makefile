@@ -29,16 +29,22 @@ $(LONGNAME): $(OBJECTS)
 	@$(CC) -shared -Wl,-soname,$(NAME) -o $@ $(LIBS) -g $^
 
 clean:
-	rm -f test gisi/*.o *.o glib-enum-binding.h $(LONGNAME)
+	rm -f test gisi/*.o *.o glib-enum-binding.h headers $(LONGNAME)
 
-install: all
+install-headers: glib-enum-binding.h
+	@echo Installing header files...
+	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi/gisi
+	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi/opcodes
+	@$(INSTALL_DATA) $(HEADERS) $(DESTDIR)$(PREFIX)/include/isi
+	@$(INSTALL_DATA) glib-enum-binding.h $(DESTDIR)$(PREFIX)/include/isi
+	@$(INSTALL_DATA) gisi/*.h $(DESTDIR)$(PREFIX)/include/isi/gisi
+	@$(INSTALL_DATA) opcodes/*.h $(DESTDIR)$(PREFIX)/include/isi/opcodes
+
+install: install-headers all
 	@echo Installing shared object...
 	@$(INSTALL_LIB) $(LONGNAME) $(DESTDIR)$(PREFIX)/lib
 	@ln -sf $(LONGNAME) $(DESTDIR)$(PREFIX)/lib/$(NAME)
 	@ln -sf $(NAME) $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
-	@echo Installing header files...
-	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/include/isi
-	@$(INSTALL_DATA) $(HEADERS) glib-enum-binding.h opcodes gisi $(DESTDIR)$(PREFIX)/include/isi
 
 uninstall:
 	@echo Removing shared object...

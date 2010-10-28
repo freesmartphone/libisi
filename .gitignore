@@ -6,3 +6,4 @@ src/glib-enum-binding.h
 html/
 test/network
 test/authenticate
+test/isi

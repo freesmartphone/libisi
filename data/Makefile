@@ -14,5 +14,7 @@ install:
 uninstall:
 	@echo Uninstall vapi file...
 	@rm -rf $(DESTDIR)$(PREFIX)/share/vala/vapi/libisi.vapi
+	@echo Uninstall pkg-config file...
+	@rm -rf $(DESTDIR)$(PREFIX)/lib/pkgconfig/libisi.pc
 
 .PHONY: all install

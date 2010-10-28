@@ -13,8 +13,8 @@ clean:
 	cd src ; make clean
 	cd test ; make clean
 
-test: install
-	cd test ; make
+test: all
+	cd test ; make all
 
 doc:
 	rm -rf html
