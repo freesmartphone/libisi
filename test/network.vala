@@ -19,7 +19,7 @@ using ISI;
 Modem m;
 Network n;
 
-void operator_list_callback(bool error, Network.operator[] operators, void *user_data) {
+void operator_list_callback(bool error, Network.operator[] operators) {
 	if(!error) {
 		for(int i=0; i<operators.length; i++)
 			message("operator %d: %s - %s - %s", i, operators[i].name, operators[i].mcc, operators[i].mnc);
@@ -28,14 +28,14 @@ void operator_list_callback(bool error, Network.operator[] operators, void *user
 	}
 }
 
-void register_callback(bool error, void *user_data) {
+void register_callback(bool error) {
 	if(!error)
 		message("You are now in Auto Register mode");
 	else
 		warning("Switching to Auto Registration mode failed");
 }
 
-void status_callback(bool error, Network.status status, void *user_data) {
+void status_callback(bool error, Network.status status) {
 	if(!error) {
 		message("STATUS: LAC: %d, CID: %d", status.lac, status.cid);
 	} else {
@@ -43,7 +43,7 @@ void status_callback(bool error, Network.status status, void *user_data) {
 	}
 }
 
-void strength_callback(bool error, uint8 strength, void *user_data) {
+void strength_callback(bool error, uint8 strength) {
 	if(!error) {
 		message("Signal Strength: %d", strength);
 	} else {
@@ -51,7 +51,7 @@ void strength_callback(bool error, uint8 strength, void *user_data) {
 	}
 }
 
-void operator_callback(bool error, Network.operator op, void *user_data) {
+void operator_callback(bool error, Network.operator op) {
 	if(!error) {
 		message("Current Provider: Name: %s, MCC: %s, MNC: %s", op.name, op.mcc, op.mnc);
 	} else {
@@ -59,34 +59,34 @@ void operator_callback(bool error, Network.operator op, void *user_data) {
 	}
 }
 
-void network_reachable(bool error, void *data) {
+void network_reachable(bool error) {
 	if(!error) {
 		/* the following commands are all working, but will spam your terminal */
 
-		n.subscribe_status(status_callback, data);
-		n.subscribe_strength(strength_callback, data);
-		n.list_operators(operator_list_callback, data);
-		n.register_auto(register_callback, data);
-		n.request_status(status_callback, data);
-		n.request_strength(strength_callback, data);
-		n.current_operator(operator_callback, data);
+		n.subscribe_status(status_callback);
+		n.subscribe_strength(strength_callback);
+		n.list_operators(operator_list_callback);
+		n.register_auto(register_callback);
+		n.request_status(status_callback);
+		n.request_strength(strength_callback);
+		n.current_operator(operator_callback);
 	} else {
 		warning("Could not create network object");
 	}
 }
 
-void modem_reachable(bool error, void *data) {
+void modem_reachable(bool error) {
 	stdout.printf("Modem Reachable Status: %s\n", error ? "down" : "up");
 
 	if(!error) {
 		m.enable();
-		n = new Network(m, network_reachable, data);
+		n = new Network(m, network_reachable);
 	}
 }
 
 void main() {
 	stdout.printf("N900 test utility\n");
-	m = new Modem("phonet0", modem_reachable, null);
+	m = new Modem("phonet0", modem_reachable);
 	var loop = new GLib.MainLoop();
 	loop.run();
 }

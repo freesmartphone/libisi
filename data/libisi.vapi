@@ -21,8 +21,8 @@ namespace ISI {
 	/**
 	 * Send as answer to the creation of a subsystem
 	 */
-	[CCode (cname = "isi_subsystem_reachable_cb", has_target = false, cheader_filename = "isi/modem.h")]
-	public delegate void subsystem_reachable(bool error, void *data);
+	[CCode (cname = "isi_subsystem_reachable_cb", cheader_filename = "isi/modem.h")]
+	public delegate void subsystem_reachable(bool error);
 
 	/**
 	 * GSM modem
@@ -30,26 +30,24 @@ namespace ISI {
 	[CCode (cname = "struct isi_modem", free_function = "isi_modem_destroy", cheader_filename = "isi/modem.h")]
 	[Compact]
 	public class Modem {
-		[CCode (cname = "isi_powerstatus_cb", has_target = false)]
-		public delegate void powerstatus_cb(bool power, void *data);
+		[CCode (cname = "isi_powerstatus_cb")]
+		public delegate void powerstatus_cb(bool power);
 
 		/**
 		 * Create modem class
 		 * @param interface interface name (e.g. "phonet0")
 		 * @param cb callback informing about (un-)successful creation
-		 * @param user_data user data being sent with the callback
 		 */
 		[CCode (cname = "isi_modem_create")]
-		public Modem(char *interface, subsystem_reachable cb, void *user_data);
+		public Modem(char *interface, subsystem_reachable cb);
 
 		/**
 		 * callback will be called if powerstatus changes. This will
 		 * overwrite the previous callback.
 		 * @param cb callback being called on powerstatus changes
-		 * @param user_data user data being sent with the callback
 		 */
 		[CCode (cname = "isi_modem_set_powerstatus_notification")]
-		public void set_powerstatus_cb(powerstatus_cb cb, void *user_data);
+		public void set_powerstatus_cb(powerstatus_cb cb);
 
 		/**
 		 * get current powerstatus
@@ -152,36 +150,36 @@ namespace ISI {
 		 * Create network GSM subsystem
 		 */
 		[CCode (cname = "isi_network_create")]
-		public Network(Modem *modem, subsystem_reachable cb, void *user_data);
+		public Network(Modem *modem, subsystem_reachable cb);
 
-		[CCode (cname = "isi_network_status_cb", has_target = false)]
-		public delegate void status_cb(bool error, status status, void *user_data);
+		[CCode (cname = "isi_network_status_cb")]
+		public delegate void status_cb(bool error, status status);
 
-		[CCode (cname = "isi_network_strength_cb", has_target = false)]
-		public delegate void strength_cb(bool error, uint8 strength, void *user_data);
+		[CCode (cname = "isi_network_strength_cb")]
+		public delegate void strength_cb(bool error, uint8 strength);
 
-		[CCode (cname = "isi_network_register_cb", has_target = false)]
-		public delegate void register_cb(bool error, void *user_data);
+		[CCode (cname = "isi_network_register_cb")]
+		public delegate void register_cb(bool error);
 
-		[CCode (cname = "isi_network_operator_cb", has_target = false)]
-		public delegate void operator_cb(bool error, operator operator, void *user_data);
+		[CCode (cname = "isi_network_operator_cb")]
+		public delegate void operator_cb(bool error, operator operator);
 
-		[CCode (cname = "isi_network_operator_list_cb", has_target = false)]
-		public delegate void operator_list_cb(bool error, operator[] operators, void *user_data);
+		[CCode (cname = "isi_network_operator_list_cb")]
+		public delegate void operator_list_cb(bool error, operator[] operators);
 
 		/**
 		 * Request to send notification for current
 		 * network status.
 		 */
 		[CCode (cname = "isi_network_request_status")]
-		public void request_status(status_cb cb, void *data);
+		public void request_status(status_cb cb);
 
 		/**
 		 * Subscribe to status changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_status")]
-		public void subscribe_status(status_cb cb, void *data);
+		public void subscribe_status(status_cb cb);
 
 		/**
 		 * Unsubscribe from status changing notifications
@@ -194,14 +192,14 @@ namespace ISI {
 		 * signal strength.
 		 */
 		[CCode (cname = "isi_network_request_strength")]
-		public void request_strength(strength_cb cb, void *data);
+		public void request_strength(strength_cb cb);
 
 		/**
 		 * Subscribe to strength changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_network_subscribe_strength")]
-		public void subscribe_strength(strength_cb cb, void *data);
+		public void subscribe_strength(strength_cb cb);
 
 		/**
 		 * Unsubscribe from strength changing notifications
@@ -213,31 +211,31 @@ namespace ISI {
 		 * Register to a specific operator
 		 */
 		[CCode (cname = "isi_network_register_manual")]
-		public void register_manual(char *mcc, char *mnc, register_cb cb, void *data);
+		public void register_manual(char *mcc, char *mnc, register_cb cb);
 
 		/**
 		 * Register to a specific operator
 		 */
 		[CCode (cname = "isi_network_register_auto")]
-		public void register_auto(register_cb cb, void *data);
+		public void register_auto(register_cb cb);
 
 		/**
 		 * Deregister from the network (''not yet implemented'')
 		 */
 		[CCode (cname = "isi_network_deregister")]
-		public void deregister(register_cb cb, void *data);
+		public void deregister(register_cb cb);
 
 		/**
 		 * Get Information about the current operator
 		 */
 		[CCode (cname = "isi_network_current_operator")]
-		public void current_operator(operator_cb cb, void *data);
+		public void current_operator(operator_cb cb);
 
 		/**
 		 * Get Information about all nearby operators
 		 */
 		[CCode (cname = "isi_network_list_operators")]
-		public void list_operators(operator_list_cb cb, void *data);
+		public void list_operators(operator_list_cb cb);
 	}
 
 	/**
@@ -255,34 +253,34 @@ namespace ISI {
 		 * Create device information GSM subsystem
 		 */
 		[CCode (cname = "isi_device_info_create")]
-		public DeviceInfo(Modem *modem, subsystem_reachable cb, void *user_data);
+		public DeviceInfo(Modem *modem, subsystem_reachable cb);
 
-		[CCode (cname = "isi_device_info_cb", has_target = false)]
-		public delegate void device_info_cb(bool error, string msg, void *user_data);
+		[CCode (cname = "isi_device_info_cb")]
+		public delegate void device_info_cb(bool error, string msg);
 
 		/**
 		 * Query Manufacturer
 		 */
 		[CCode (cname = "isi_device_info_query_manufacturer")]
-		public void query_manufacturer(device_info_cb cb, void *data);
+		public void query_manufacturer(device_info_cb cb);
 
 		/**
 		 * Query Model
 		 */
 		[CCode (cname = "isi_device_info_query_model")]
-		public void query_model(device_info_cb cb, void *data);
+		public void query_model(device_info_cb cb);
 
 		/**
 		 * Query Revision
 		 */
 		[CCode (cname = "isi_device_info_query_revision")]
-		public void query_revision(device_info_cb cb, void *data);
+		public void query_revision(device_info_cb cb);
 
 		/**
 		 * Query Serial (IMEI)
 		 */
 		[CCode (cname = "isi_device_info_query_serial")]
-		public void query_serial(device_info_cb cb, void *data);
+		public void query_serial(device_info_cb cb);
 	}
 
 	/**
@@ -295,7 +293,7 @@ namespace ISI {
 		 * Create SIM card GSM subsystem
 		 */
 		[CCode (cname = "isi_sim_create")]
-		public SIM(Modem *modem, subsystem_reachable cb, void *user_data);
+		public SIM(Modem *modem, subsystem_reachable cb);
 	}
 
 	/**
@@ -337,73 +335,67 @@ namespace ISI {
 		[CCode (cname = "isi_sim_auth_create")]
 		public SIMAuth(Modem *modem);
 
-		[CCode (cname = "isi_sim_auth_cb", has_target = false)]
-		public delegate void auth_cb(answer code, void *user_data);
+		[CCode (cname = "isi_sim_auth_cb")]
+		public delegate void auth_cb(answer code);
 
-		[CCode (cname = "isi_sim_auth_status_cb", has_target = false)]
-		public delegate void auth_status_cb(status code, void *user_data);
+		[CCode (cname = "isi_sim_auth_status_cb")]
+		public delegate void auth_status_cb(status code);
 
 		/**
 		 * Set PIN code
 		 * @param pin The PIN code
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_pin")]
-		public void set_pin(string pin, auth_cb cb, void *data);
+		public void set_pin(string pin, auth_cb cb);
 
 		/**
 		 * Set PUK code
 		 * @param puk The PUK code
 		 * @param pin The new PIN code
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_puk")]
-		public void set_puk(string puk, string pin, auth_cb cb, void *data);
+		public void set_puk(string puk, string pin, auth_cb cb);
 
 		/**
 		 * Change the PIN code
 		 * @param old_pin The old PIN code
 		 * @param new_pin The new PIN code
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_update_pin")]
-		public void update_pin(string old_pin, string new_pin, auth_cb cb, void *data);
+		public void update_pin(string old_pin, string new_pin, auth_cb cb);
 
 		/**
 		 * Get PIN Protection Status
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_get_pin_protection")]
-		public void get_pin_protection(auth_status_cb cb, void *data);
+		public void get_pin_protection(auth_status_cb cb);
 
 		/**
 		 * Set PIN Protection Status
 		 * @param pin The pin to access this feature
 		 * @param status true=enable the protection, false=disable it
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_set_pin_protection")]
-		public void set_pin_protection(string pin, bool status, auth_status_cb cb, void *data);
+		public void set_pin_protection(string pin, bool status, auth_status_cb cb);
 
 		/**
 		 * Request SIM Auth status
 		 * @param cb The callback with the status feedback
-		 * @param data user data for the callback
 		 */
 		[CCode (cname = "isi_sim_auth_request_status")]
-		public void request_status(auth_status_cb cb, void *data);
+		public void request_status(auth_status_cb cb);
 
 		/**
 		 * Subscribe to status changing notifications
 		 * Overwrites previous set callback
 		 */
 		[CCode (cname = "isi_sim_auth_subscribe_status")]
-		public void subscribe_status(auth_status_cb cb, void *data);
+		public void subscribe_status(auth_status_cb cb);
 
 		/**
 		 * Unsubscribe from status changing notifications

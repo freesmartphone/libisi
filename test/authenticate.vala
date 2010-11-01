@@ -21,7 +21,7 @@ Modem m;
 SIMAuth s;
 MainLoop l;
 
-void pin_callback(SIMAuth.answer msg, void *data) {
+void pin_callback(SIMAuth.answer msg) {
 	if(msg == SIMAuth.answer.OK) {
 		message("Valid PIN");
 		l.quit();
@@ -32,13 +32,13 @@ void pin_callback(SIMAuth.answer msg, void *data) {
 	}
 }
 
-void modem_reachable(bool error, void *data) {
+void modem_reachable(bool error) {
 	message("Modem Reachable Status: %s", error ? "down" : "up");
 
 	if(!error) {
 		m.enable();
 		s = new SIMAuth(m);
-		s.set_pin(pin, pin_callback, null);
+		s.set_pin(pin, pin_callback);
 	} else {
 		l.quit();
 	}
@@ -52,7 +52,7 @@ void main(string[] argv) {
 	else
 		pin = argv[1];
 
-	m = new Modem("phonet0", modem_reachable, null);
+	m = new Modem("phonet0", modem_reachable);
 	l = new GLib.MainLoop();
 	l.run();
 }
