@@ -2,6 +2,8 @@
 *.so.*
 *.o
 *.swp
+src/gisi/.deps
+src/gisi/.dirstamp
 src/glib-enum-binding.h
 html/
 test/network
