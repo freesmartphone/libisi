@@ -142,14 +142,14 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 	st.cid = -1;
 	st.technology = -1;
 
-	if(!msg) {
-		g_warning("ISI client error: %d", g_isi_client_error(client));
-		goto error;
-	}
-
 	if(!cb) {
 		g_warning("no callback defined!");
 		return;
+	}
+
+	if(!msg) {
+		g_warning("ISI client error: %d", g_isi_client_error(client));
+		goto error;
 	}
 
 	/* package too small */
