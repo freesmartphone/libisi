@@ -47,7 +47,6 @@ static void gps_status_ind_cb(GIsiClient *client, const void *restrict data, siz
 
 }
 
-
 void isi_gps_status_subscribe(struct isi_gps *nd, isi_gps_status_cb cb, void *user_data) {
 	struct isi_cb_data *cbd = isi_cb_data_new(nd, cb, user_data);
 	if(!cbd || g_isi_subscribe(nd->client, GPS_STATUS_IND, gps_status_ind_cb, cbd)) {

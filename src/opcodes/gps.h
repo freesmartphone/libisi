@@ -26,9 +26,24 @@ extern "C" {
 
 enum gps_message_id {
 	GPS_STATUS_IND	= 0x7d,
-	GPS_STATUS_REQ	= 0x90,
-	GPS_STATUS_RESP	= 0x91,
+	GPS_POWER_REQ	= 0x90,
+	GPS_POWER_RESP	= 0x91,
 	GPS_DATA_IND	= 0x92
+};
+
+enum gps_data_subpkg_id {
+	GPS_DATA_POSITION	= 0x02,
+	GPS_TIME_DATE		= 0x03,
+	GPS_MOVEMENT		= 0x04,
+	GPS_SATELLITE_INFO	= 0x05,
+	GPS_CELL_INFO_GSM	= 0x07,
+	GPS_CELL_INFO_WCDMA	= 0x08
+};
+
+enum gps_status {
+	GPS_DISABLED		= 0x00,
+	GPS_NOT_LOCKED		= 0x01,
+	GPS_LOCKED			= 0x02
 };
 
 #ifdef __cplusplus
