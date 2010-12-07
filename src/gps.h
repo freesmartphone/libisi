@@ -11,7 +11,6 @@ struct isi_gps {
 	GIsiClient *client;
 };
 
-
 typedef enum {
 	ISI_GPS_STATUS_ERROR,
 	ISI_GPS_STATUS_DISABLED,
@@ -20,7 +19,16 @@ typedef enum {
 } IsiGpsStatus;
 
 struct isi_gps_data {
-	
+	/* TODO: create structures for
+	   position
+	   time/date
+	   movement
+	   satellite info
+	   cell info gsm
+	   cell info wcdma
+	   isi_gps_data contains references to
+	   this structures or NULL if not set
+	*/
 };
 
 /* callbacks */
