@@ -26,7 +26,7 @@ glib-enum-binding.h: $(HEADERS)
 
 $(LONGNAME): $(OBJECTS)
 	@echo "[LD] $@"
-	@$(CC) -shared -Wl,-soname,$(NAME) -o $@ $(LIBS) -g $^
+	@$(CC) $(LDFLAGS) -shared -Wl,-soname,$(NAME) -o $@ $(LIBS) -g $^
 
 clean:
 	rm -f test gisi/*.o *.o glib-enum-binding.h $(LONGNAME)
