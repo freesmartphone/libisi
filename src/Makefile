@@ -18,7 +18,7 @@ all: $(LONGNAME) glib-enum-binding.h
 glib-enum-binding.h: $(HEADERS)
 	@echo "Generating glib-enum-binding.h"
 	@glib-mkenums \
-		--fprod "\n/* enumerations from \"@filename@\" */" \
+		--fprod "\n/* enumerations from \"@filename@\" */\n#include \"isi/simauth.h\"\n#include \"isi/gps.h\"\n" \
 		--vhead "GType\n@enum_name@_get_type (void)\n{\n  static GType etype = 0;\n  if (etype == 0) {\n    static const G@Type@Value values[] = {" \
 		--vprod "      { @VALUENAME@, \"@VALUENAME@\", \"@valuenick@\" }," \
 		--vtail "      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static (\"@EnumName@\", values);\n  }\n  return etype;\n}\n#define @ENUMNAME@_TYPE (@enum_name@_get_type())\n\n" \
