@@ -42,6 +42,7 @@ install-headers: glib-enum-binding.h
 
 install: install-headers all
 	@echo Installing shared object...
+	@$(CREATE_DIR) $(DESTDIR)$(PREFIX)/lib
 	@$(INSTALL_LIB) $(LONGNAME) $(DESTDIR)$(PREFIX)/lib
 	@ln -sf $(LONGNAME) $(DESTDIR)$(PREFIX)/lib/$(NAME)
 	@ln -sf $(NAME) $(DESTDIR)$(PREFIX)/lib/$(UNVERSIONED)
