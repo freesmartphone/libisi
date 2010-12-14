@@ -21,13 +21,13 @@ namespace ISI {
 	/**
 	 * Send as answer to the creation of a subsystem
 	 */
-	[CCode (cname = "isi_subsystem_reachable_cb", cheader_filename = "isi/modem.h")]
+	[CCode (cname = "isi_subsystem_reachable_cb", cheader_filename = "modem.h")]
 	public delegate void subsystem_reachable(bool error);
 
 	/**
 	 * GSM modem
 	 */
-	[CCode (cname = "struct isi_modem", free_function = "isi_modem_destroy", cheader_filename = "isi/modem.h")]
+	[CCode (cname = "struct isi_modem", free_function = "isi_modem_destroy", cheader_filename = "modem.h")]
 	[Compact]
 	public class Modem {
 		[CCode (cname = "isi_powerstatus_cb")]
@@ -71,7 +71,7 @@ namespace ISI {
 	/**
 	 * The network subsystem of the GSM modem
 	 */
-	[CCode (cname = "struct isi_network", free_function = "isi_network_destroy", cheader_filename = "isi/network.h")]
+	[CCode (cname = "struct isi_network", free_function = "isi_network_destroy", cheader_filename = "network.h")]
 	[Compact]
 	public class Network {
 		[CCode (cname = "net_reg_status")]
@@ -246,7 +246,7 @@ namespace ISI {
 	/**
 	 * The Device Information subsystem of the GSM modem
 	 */
-	[CCode (cname = "struct isi_device_info", free_function = "isi_device_info_destroy", cheader_filename = "isi/device_info.h")]
+	[CCode (cname = "struct isi_device_info", free_function = "isi_device_info_destroy", cheader_filename = "device_info.h")]
 	[Compact]
 	public class DeviceInfo {
 		/**
@@ -286,7 +286,7 @@ namespace ISI {
 	/**
 	 * The SIM subsystem of the GSM modem (''not yet implemented'')
 	 */
-	[CCode (cname = "struct isi_sim", free_function = "isi_sim_destroy", cheader_filename = "isi/sim.h")]
+	[CCode (cname = "struct isi_sim", free_function = "isi_sim_destroy", cheader_filename = "sim.h")]
 	[Compact]
 	public class SIM {
 		/**
@@ -299,10 +299,10 @@ namespace ISI {
 	/**
 	 * The SIM Authentication subsystem of the GSM modem
 	 */
-	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "isi/simauth.h")]
+	[CCode (cname = "struct isi_sim_auth", free_function = "isi_sim_auth_destroy", cheader_filename = "simauth.h")]
 	[Compact]
 	public class SIMAuth {
-		[CCode (cname = "IsiSimAuthAnswer", cheader_filename="isi/glib-enum-binding.h", has_type_id="ISI_SIM_AUTH_ANSWER_TYPE")]
+		[CCode (cname = "IsiSimAuthAnswer", cheader_filename = "isi-enum-types.h", has_type_id="ISI_SIM_AUTH_ANSWER_TYPE")]
 		public enum answer {
 			OK,
 			ERR_UNKNOWN,
@@ -312,7 +312,7 @@ namespace ISI {
 			ERR_NEED_PUK
 		}
 
-		[CCode (cname = "IsiSimAuthStatus", cheader_filename="isi/glib-enum-binding.h", has_type_id="ISI_SIM_AUTH_STATUS_TYPE")]
+		[CCode (cname = "IsiSimAuthStatus", cheader_filename = "isi-enum-types.h", has_type_id="ISI_SIM_AUTH_STATUS_TYPE")]
 		public enum status {
 			ERROR,
 			NO_SIM,
