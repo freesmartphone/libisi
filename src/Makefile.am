@@ -2,7 +2,6 @@ NULL =
 
 AM_CFLAGS = \
 	    $(GLIB_CFLAGS) \
-	    $(LIBNL_CFLAGS) \
 	    -std=c99 \
 	    $(NULL)
 lib_LTLIBRARIES = \
@@ -31,7 +30,6 @@ libisi_la_SOURCES = \
 
 libisi_la_LIBADD = \
 		   $(GLIB_LIBS) \
-		   $(LIBNL_LIBS) \
 		   $(NULL)
 
 enum_headers = modem.h network.h device_info.h sim.h simauth.h gps.h

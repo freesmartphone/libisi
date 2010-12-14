@@ -18,16 +18,9 @@ AC_SUBST(LDFLAGS)
 PKG_PROG_PKG_CONFIG
 VALA_REQUIRED=0.9.7
 GLIB_REQUIRED=2.18.0
-LIBNL_REQUIRED=2.0
 
 PKG_CHECK_MODULES(GLIB,
                   glib-2.0 >= $GLIB_REQUIRED)
-
-# libnl-2.0
-PKG_CHECK_MODULES(LIBNL,
-  libnl-2.0 >= $LIBNL_REQUIRED)
-AC_SUBST(LIBNL_CFLAGS)
-AC_SUBST(LIBNL_LIBS)
 
 AC_ARG_ENABLE(tests,
               [--enable-tests           Enable tests(default=disables)],

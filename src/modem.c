@@ -14,7 +14,7 @@
 
 #include "debug.h"
 #include "modem.h"
-#include <netlink/netlink.h>
+#include "gisi/netlink.h"
 #include "helper.h"
 
 void mtc_state_cb(GIsiClient *client, const void *restrict data, size_t len, uint16_t object, void *opaque) {
