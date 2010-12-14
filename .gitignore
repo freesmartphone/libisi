@@ -21,6 +21,7 @@ src/gisi/.deps
 src/gisi/.dirstamp
 src/isi-enum-types.h
 data/libisi.pc
+test/*.c
 html/
 test/network
 test/authenticate
