@@ -14,7 +14,7 @@ VALAC_ARGS = \
 	     -C \
 	     $(NULL)
 
-noinst_PROGRAMS = $(TEST_PROGS)
+sbin_PROGRAMS = $(TEST_PROGS)
 
 progs_ldadd = \
 		$(GLIB_LIBS)  \
