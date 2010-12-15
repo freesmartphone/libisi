@@ -20,7 +20,7 @@
  */
 
 #include <stdint.h>
-#include <gisi/modem.h>
+#include <isi/gisi/modem.h>
 
 #ifndef __GPHONET_NETLINK_H
 #define __GPHONET_NETLINK_H

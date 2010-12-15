@@ -59,7 +59,7 @@ AC_PATH_PROG([GLIB_MKENUMS],[glib-mkenums])
 
 AC_CONFIG_FILES([
                  Makefile
-                 src/Makefile
+                 isi/Makefile
                  data/Makefile
                  data/libisi.pc
                  test/Makefile])

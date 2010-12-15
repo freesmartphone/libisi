@@ -28,7 +28,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <glib/gtypes.h>
-#include <gisi/modem.h>
+#include <isi/gisi/modem.h>
 #include "phonet.h"
 
 struct _GIsiClient;

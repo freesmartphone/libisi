@@ -2,7 +2,6 @@ NULL =
 
 AM_CFLAGS = \
 	    -I$(top_srcdir) \
-	    -I$(top_srcdir)/src \
 	    $(GLIB_CFLAGS) \
 	    $(GOBJECT_CFLAGS) \
 	    -std=c99 \
@@ -19,7 +18,7 @@ sbin_PROGRAMS = $(TEST_PROGS)
 progs_ldadd = \
 		$(GLIB_LIBS)  \
 		$(GOBJECT_LIBS) \
-		../src/libisi.la \
+		$(top_srcdir)/isi/libisi.la \
 		$(NULL)
 
 TEST_PROGS = network

@@ -1,7 +1,7 @@
 NULL =
 
 SUBDIRS = \
-	  src \
+	  isi \
 	  data \
 	  $(NULL)
 

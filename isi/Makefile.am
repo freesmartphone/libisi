@@ -43,7 +43,7 @@ isi-enum-types.h: $(enum_headers)
 		--vtail '      { 0, NULL, NULL }\n    };\n    etype = g_@type@_register_static ("@EnumName@", values);\n  }\n  return etype;\n}\n#define @ENUMNAME@_TYPE (@enum_name@_get_type())\n\n' \
 		$^ > isi-enum-types.h
 
-libisiincludedir = $(includedir)/isi
+libisiincludedir = $(includedir)/isi-0.0/isi
 libisiinclude_DATA = \
 		     debug.h \
 		     device_info.h \
@@ -57,7 +57,7 @@ libisiinclude_DATA = \
 		     isi-enum-types.h \
 		     $(NULL)
 
-libisiopcodesincludedir = $(includedir)/isi/opcodes
+libisiopcodesincludedir = $(includedir)/isi-0.0/isi/opcodes
 libisiopcodesinclude_DATA = \
 			    opcodes/call.h \
 			    opcodes/gpds.h \
@@ -72,7 +72,7 @@ libisiopcodesinclude_DATA = \
 			    opcodes/ss.h \
 			    $(NULL)
 
-libisigisiincludedir = $(includedir)/isi//gisi
+libisigisiincludedir = $(includedir)/isi-0.0/isi/gisi
 libisigisiinclude_DATA = \
 			 gisi/client.h \
 			 gisi/iter.h \

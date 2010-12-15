@@ -17,9 +17,9 @@ install-sh
 libtool
 missing
 stamp-h1
-src/gisi/.deps
-src/gisi/.dirstamp
-src/isi-enum-types.h
+isi/gisi/.deps
+isi/gisi/.dirstamp
+isi/isi-enum-types.h
 data/libisi.pc
 test/*.c
 html/
