@@ -17,7 +17,10 @@ isi.so: $(OBJECTS)
 clean:
 	@rm -f isi.so src/*.o
 
+maintainer-clean: clean
+
+
 install: isi.so
 	install isi.so ${PREFIX}/${PLUGINDIR}
 
-.PHONEY: clean install
+.PHONEY: clean maintainer-clean install
