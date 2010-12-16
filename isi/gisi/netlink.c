@@ -34,8 +34,7 @@
 #define SOL_NETLINK 270 /* libc!? */
 #endif
 #include "phonet.h"
-#include <linux/rtnetlink.h>
-#include <linux/if.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
 #include <errno.h>
 #include <glib.h>
@@ -45,6 +44,10 @@
 
 #ifndef ARPHRD_PHONET
 #define ARPHRD_PHONET (820)
+#endif
+
+#ifndef IFF_LOWER_UP
+#define IFF_LOWER_UP	0x10000		/* driver signals L1 up		*/
 #endif
 
 /*
