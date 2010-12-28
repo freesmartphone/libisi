@@ -39,7 +39,7 @@ namespace ISI {
 		 * @param cb callback informing about (un-)successful creation
 		 */
 		[CCode (cname = "isi_modem_create")]
-		public Modem(char *interface, subsystem_reachable cb);
+		public Modem(string iface, subsystem_reachable cb);
 
 		/**
 		 * callback will be called if powerstatus changes. This will
@@ -211,7 +211,7 @@ namespace ISI {
 		 * Register to a specific operator
 		 */
 		[CCode (cname = "isi_network_register_manual")]
-		public void register_manual(char *mcc, char *mnc, register_cb cb);
+		public void register_manual(string mcc, string mnc, register_cb cb);
 
 		/**
 		 * Register to a specific operator
