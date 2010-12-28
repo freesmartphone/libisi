@@ -23,7 +23,7 @@ PKG_CHECK_MODULES(GLIB,
                   glib-2.0 >= $GLIB_REQUIRED)
 
 AC_ARG_ENABLE(tests,
-              [--enable-tests           Enable tests(default=disables)],
+              [--enable-tests           Enable tests(default=disabled)],
               [enable_tests=$enableval],
               [enable_tests="no"])
 
