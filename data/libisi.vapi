@@ -150,7 +150,7 @@ namespace ISI {
 		 * Create network GSM subsystem
 		 */
 		[CCode (cname = "isi_network_create")]
-		public Network(Modem *modem, subsystem_reachable cb);
+		public Network(Modem modem, subsystem_reachable cb);
 
 		[CCode (cname = "isi_network_status_cb")]
 		public delegate void status_cb(bool error, status status);
@@ -253,7 +253,7 @@ namespace ISI {
 		 * Create device information GSM subsystem
 		 */
 		[CCode (cname = "isi_device_info_create")]
-		public DeviceInfo(Modem *modem, subsystem_reachable cb);
+		public DeviceInfo(Modem modem, subsystem_reachable cb);
 
 		[CCode (cname = "isi_device_info_cb")]
 		public delegate void device_info_cb(bool error, string msg);
@@ -293,7 +293,7 @@ namespace ISI {
 		 * Create SIM card GSM subsystem
 		 */
 		[CCode (cname = "isi_sim_create")]
-		public SIM(Modem *modem, subsystem_reachable cb);
+		public SIM(Modem modem, subsystem_reachable cb);
 	}
 
 	/**
@@ -333,7 +333,7 @@ namespace ISI {
 		 * Create SIM auth GSM subsystem
 		 */
 		[CCode (cname = "isi_sim_auth_create")]
-		public SIMAuth(Modem *modem);
+		public SIMAuth(Modem modem);
 
 		[CCode (cname = "isi_sim_auth_cb")]
 		public delegate void auth_cb(answer code);
