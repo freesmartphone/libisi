@@ -9,7 +9,7 @@ AM_CFLAGS = \
 
 VALAC_ARGS = \
 	     --vapidir=$(top_srcdir)/data \
-	     --pkg=libisi \
+	     --pkg libisi \
 	     -C \
 	     $(NULL)
 
