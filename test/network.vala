@@ -19,7 +19,7 @@ using ISI;
 Modem m;
 Network n;
 
-void operator_list_callback(bool error, Network.operator[] operators) {
+void operator_list_callback(bool error, Network.Operator[] operators) {
 	if(!error) {
 		for(int i=0; i<operators.length; i++)
 			message("operator %d: %s - %s - %s", i, operators[i].name, operators[i].mcc, operators[i].mnc);
@@ -35,7 +35,7 @@ void register_callback(bool error) {
 		warning("Switching to Auto Registration mode failed");
 }
 
-void status_callback(bool error, Network.status status) {
+void status_callback(bool error, Network.Status status) {
 	if(!error) {
 		message("STATUS: LAC: %d, CID: %d", status.lac, status.cid);
 	} else {
@@ -51,7 +51,7 @@ void strength_callback(bool error, uint8 strength) {
 	}
 }
 
-void operator_callback(bool error, Network.operator op) {
+void operator_callback(bool error, Network.Operator op) {
 	if(!error) {
 		message("Current Provider: Name: %s, MCC: %s, MNC: %s", op.name, op.mcc, op.mnc);
 	} else {

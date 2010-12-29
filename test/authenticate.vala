@@ -21,8 +21,8 @@ Modem m;
 SIMAuth s;
 MainLoop l;
 
-void pin_callback(SIMAuth.answer msg) {
-	if(msg == SIMAuth.answer.OK) {
+void pin_callback(SIMAuth.Answer msg) {
+	if(msg == SIMAuth.Answer.OK) {
 		message("Valid PIN");
 		l.quit();
 	} else {

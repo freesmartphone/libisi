@@ -75,7 +75,7 @@ namespace ISI {
 	[Compact]
 	public class Network {
 		[CCode (cname = "net_reg_status")]
-		public enum registration_status {
+		public enum RegistrationStatus {
 			HOME = 0x00,
 			ROAM = 0x01,
 			ROAM_BLINK = 0x02,
@@ -90,7 +90,7 @@ namespace ISI {
 		}
 
 		[CCode (cname = "net_technology")]
-		public enum technology {
+		public enum Technology {
 			GSM = 0x00,
 			GSM_COMPACT = 0x01,
 			UMTS = 0x02,
@@ -104,11 +104,11 @@ namespace ISI {
 		 * Data send to network status callback
 		 */
 		[CCode (cname = "struct network_status")]
-		public struct status {
+		public struct Status {
 			/**
 			 * Network Registration Status
 			 */
-			registration_status status;
+			RegistrationStatus status;
 			/**
 			 * Location Area Code
 			 */
@@ -120,14 +120,14 @@ namespace ISI {
 			/**
 			 * Technology
 			 */
-			technology technology;
+			Technology technology;
 		}
 
 		/**
 		 * Data send to network operator callback
 		 */
 		[CCode (cname = "struct network_operator")]
-		public struct operator {
+		public struct Operator {
 			/**
 			 * Network Operator Name
 			 */
@@ -153,7 +153,7 @@ namespace ISI {
 		public Network(Modem modem, subsystem_reachable cb);
 
 		[CCode (cname = "isi_network_status_cb")]
-		public delegate void status_cb(bool error, status status);
+		public delegate void status_cb(bool error, Status status);
 
 		[CCode (cname = "isi_network_strength_cb")]
 		public delegate void strength_cb(bool error, uint8 strength);
@@ -162,10 +162,10 @@ namespace ISI {
 		public delegate void register_cb(bool error);
 
 		[CCode (cname = "isi_network_operator_cb")]
-		public delegate void operator_cb(bool error, operator operator);
+		public delegate void operator_cb(bool error, Operator operator);
 
 		[CCode (cname = "isi_network_operator_list_cb")]
-		public delegate void operator_list_cb(bool error, operator[] operators);
+		public delegate void operator_list_cb(bool error, Operator[] operators);
 
 		/**
 		 * Request to send notification for current
@@ -239,11 +239,6 @@ namespace ISI {
 	}
 
 	/**
-	 * The USSD subsystem of the GSM modem (''not yet implemented'')
-	 */
-	public class USSD { }
-
-	/**
 	 * The Device Information subsystem of the GSM modem
 	 */
 	[CCode (cname = "struct isi_device_info", free_function = "isi_device_info_destroy", cheader_filename = "isi/device_info.h")]
@@ -303,7 +298,7 @@ namespace ISI {
 	[Compact]
 	public class SIMAuth {
 		[CCode (cname = "IsiSimAuthAnswer", cheader_filename = "isi/isi-enum-types.h", has_type_id="ISI_SIM_AUTH_ANSWER_TYPE")]
-		public enum answer {
+		public enum Answer {
 			OK,
 			ERR_UNKNOWN,
 			ERR_PIN_TOO_LONG,
@@ -313,7 +308,7 @@ namespace ISI {
 		}
 
 		[CCode (cname = "IsiSimAuthStatus", cheader_filename = "isi/isi-enum-types.h", has_type_id="ISI_SIM_AUTH_STATUS_TYPE")]
-		public enum status {
+		public enum Status {
 			ERROR,
 			NO_SIM,
 			NEED_NONE,
@@ -336,10 +331,10 @@ namespace ISI {
 		public SIMAuth(Modem modem);
 
 		[CCode (cname = "isi_sim_auth_cb")]
-		public delegate void auth_cb(answer code);
+		public delegate void auth_cb(Answer code);
 
 		[CCode (cname = "isi_sim_auth_status_cb")]
-		public delegate void auth_status_cb(status code);
+		public delegate void auth_status_cb(Status code);
 
 		/**
 		 * Set PIN code
@@ -418,6 +413,11 @@ namespace ISI {
 	 * The SMS subsystem of the GSM modem (''not yet implemented'')
 	 */
 	public class SMS { }
+
+	/**
+	 * The USSD subsystem of the GSM modem (''not yet implemented'')
+	 */
+	public class USSD { }
 
 	/**
 	 * The GPS subsystem of the GSM modem (''not yet implemented'')
