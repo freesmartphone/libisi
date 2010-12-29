@@ -74,7 +74,7 @@ namespace ISI {
 	[CCode (cname = "struct isi_network", free_function = "isi_network_destroy", cheader_filename = "isi/network.h")]
 	[Compact]
 	public class Network {
-		[CCode (cname = "net_reg_status")]
+		[CCode (cname = "net_reg_status", cprefix = "NET_REG_STATUS_")]
 		public enum RegistrationStatus {
 			HOME = 0x00,
 			ROAM = 0x01,
