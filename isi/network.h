@@ -24,6 +24,7 @@ struct network_operator {
 	char mcc[4]; // 3 + \0
 	char mnc[4]; // 2-3 + \0
 	int status;
+	enum net_technology technology;
 };
 
 struct isi_network {

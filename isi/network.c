@@ -155,11 +155,11 @@ void reg_status_ind_cb(GIsiClient *client, const void *restrict data, size_t len
 	/* package too small */
 	if(len < 3)
 		goto error;
-	
+
 	/* check if we received a status package */
 	if(msg[0] != NET_REG_STATUS_IND && msg[0] != NET_REG_STATUS_GET_RESP)
 		goto error;
-	
+
 	if(msg[0] == NET_REG_STATUS_GET_RESP && msg[1] != NET_CAUSE_OK) {
 		g_warning("Request failed: %s", net_isi_cause_name(msg[1]));
 		goto error;
@@ -620,10 +620,12 @@ gboolean available_resp_cb(GIsiClient *client, const void *restrict data, size_t
 			}
 			case NET_DETAILED_NETWORK_INFO: {
 				struct network_operator *op;
+				uint8_t umts = 0;
 
 				op = list + detail++;
-				if (!g_isi_sb_iter_get_oper_code(&iter, op->mcc, op->mnc, 2))
+				if (!g_isi_sb_iter_get_oper_code(&iter, op->mcc, op->mnc, 2) || !g_isi_sb_iter_get_byte(&iter, &umts, 7))
 					goto error;
+				op->technology = umts ? NET_TECHNOLOGY_UMTS : NET_TECHNOLOGY_EPGRS;
 				break;
 			}
 			default:

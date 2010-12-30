@@ -144,6 +144,10 @@ namespace ISI {
 			 * Status Code (not set by current_operator method)
 			 */
 			int status;
+			/**
+			 * Technology
+			 */
+			Technology technology;
 		}
 
 		/**

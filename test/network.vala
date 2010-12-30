@@ -22,7 +22,7 @@ Network n;
 void operator_list_callback(bool error, Network.Operator[] operators) {
 	if(!error) {
 		for(int i=0; i<operators.length; i++)
-			message("operator %d: %s - %s - %s", i, operators[i].name, operators[i].mcc, operators[i].mnc);
+			message("operator %d: %s - %s - %s (%d)", i, operators[i].name, operators[i].mcc, operators[i].mnc, operators[i].technology);
 	} else {
 		warning("Could not get operator list");
 	}
@@ -86,7 +86,7 @@ void modem_reachable(bool error) {
 
 void main() {
 	stdout.printf("N900 test utility\n");
-	m = new Modem("phonet0", modem_reachable);
+	m = new Modem("usbpn0", modem_reachable);
 	var loop = new GLib.MainLoop();
 	loop.run();
 }
