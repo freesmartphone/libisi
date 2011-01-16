@@ -165,6 +165,7 @@ struct isi_modem* isi_modem_create(char *interface, isi_subsystem_reachable_cb c
 
 	modem->idx = g_isi_modem_by_name(interface);
 	modem->link = g_pn_netlink_start(modem->idx, netlink_status_cb, cbd);
+	modem->client = NULL;
 
 	if(!modem->link)
 		goto error;
